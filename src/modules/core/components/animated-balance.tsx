@@ -5,5 +5,5 @@ interface AnimatedBalanceProps {
 }
 
 export const AnimatedBalance = ({ amount }: AnimatedBalanceProps) => {
-  return <CountUp start={0} end={amount} decimals={2} prefix="$" />;
+  return <CountUp start={0} end={amount} decimals={2} prefix="$"  />;
 };

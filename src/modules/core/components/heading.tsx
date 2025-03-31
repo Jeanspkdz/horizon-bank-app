@@ -17,8 +17,8 @@ export const Heading = (props: HeadingProps) => {
   return (
     <>
       {props.type == "greeting" && (
-        <h2 className="font-bold">
-          {props.title}, <span className="text-sky-500">{props.name}</span>
+        <h2 className="font-bold text-3xl">
+          {props.title} <span className="text-sky-500">{props.name}</span>
         </h2>
       ) }
 
@@ -28,7 +28,7 @@ export const Heading = (props: HeadingProps) => {
         )
       }
 
-      <h3 className="text-xs text-slate-700">{props.subtitle}</h3>
+      <h3 className="text-base text-slate-700 mt-1 ">{props.subtitle}</h3>
     </>
   );
 };

@@ -52,12 +52,12 @@ export function DoughnutChart() {
   }, []);
   return (
     <Card className="">
-      <CardContent className="flex flex-col xs:flex-row gap-2">
+      <CardContent className="flex flex-col xs:flex-row gap-5 py-0">
         <ChartContainer
           config={chartConfig}
-          className="min-h-[120px] h-[120px] aspect-square"
+          className="aspect-square min-h-[120px] max-h-[150px]"
         >
-          <PieChart>
+          <PieChart margin={{ top: -10, left: -10, right: -10, bottom: -10 }} >
             <ChartTooltip
               cursor={false}
               content={<ChartTooltipContent hideLabel />}
@@ -66,22 +66,22 @@ export function DoughnutChart() {
               data={chartData}
               dataKey="money"
               nameKey="bank"
-              innerRadius={25}
+              innerRadius="50%"
               strokeWidth={5}
-              className=""
+              paddingAngle={2}
             ></Pie>
           </PieChart>
         </ChartContainer>
 
         <div className="flex flex-col justify-between">
-          <h4 className="font-semibold">
-            Bank Accounts : <span>1</span>
+          <h4 className="font-semibold text-lg">
+            Bank Accounts: <span>1</span>
           </h4>
 
           <div>
-            <p className="text-slate-700 text-xs mb-1">Total Current Balance</p>
+            <p className="text-slate-700 text-base mb-1 font-medium">Total Current Balance</p>
 
-            <div className="font-bold text-xl">
+            <div className="font-medium text-2xl md:text-4xl">
               <AnimatedBalance
                 amount={totalBalance}
               />
