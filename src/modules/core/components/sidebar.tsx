@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import {
   Sidebar as ShadCnSidebar,
@@ -19,6 +21,7 @@ import {
   CreditCard,
   Handshake,
 } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 const sidebarItems = [
   {
@@ -49,6 +52,9 @@ const sidebarItems = [
 ];
 
 export const Sidebar = () => {
+  const pathname = usePathname();
+  const isActive = (route: string) => pathname == route;
+
   return (
     <section>
       <ShadCnSidebar>
@@ -73,12 +79,21 @@ export const Sidebar = () => {
                 <SidebarMenuItem key={route}>
                   <SidebarMenuButton
                     asChild
-                    className="hover:bg-blue-500 hover:text-white active:bg-blue-600 active:text-white h-auto pl-5 py-3 flex items-center group/menu-item"
+                    isActive={isActive(route)}
+                    className="h-auto pl-5 py-3 flex items-center"
                   >
-                    <Link href={route}>
-                      <Icon size={24} className="text-gray-500 group-hover/menu-item:text-white" />
-                      <span>{label}</span>
+                    <Link
+                      href={route}
+                      className="hover:bg-blue-500! hover:text-white! active:bg-blue-600! active:text-white! group/menu-button data-[active=true]:bg-blue-600! data-[active=true]:text-white! transition-colors "
+                    >
+                      <Icon
+                        size={24}
+                        className="text-gray-500 group-hover/menu-button:text-white group-data-[active=true]/menu-button:text-white transition-colors"
+                      />
+                      <span className="font-semibold">{label}</span>
                     </Link>
+                    {/* group/menu-item
+                    data-[active=true]:bg-blue-600 data-[active=true]:text-white */}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -86,7 +101,7 @@ export const Sidebar = () => {
           </SidebarGroup>
         </SidebarContent>
 
-        <SidebarRail/>
+        <SidebarRail />
       </ShadCnSidebar>
     </section>
   );
