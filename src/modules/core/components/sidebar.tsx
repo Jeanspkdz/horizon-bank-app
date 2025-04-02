@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import {
   Sidebar as ShadCnSidebar,
   SidebarContent,
@@ -22,6 +21,7 @@ import {
   Handshake,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { Logo } from "./logo";
 
 const sidebarItems = [
   {
@@ -59,17 +59,7 @@ export const Sidebar = () => {
     <section>
       <ShadCnSidebar>
         <SidebarHeader className="bg-white p-5">
-          <div className="flex flex-row items-center gap-2 cursor-pointer">
-            <Image
-              src={"/images/logo.svg"}
-              width={34}
-              height={34}
-              alt="Horizon Logo Image"
-            />
-            <h1 className="text-3xl font-bold text-sky-950 font-ibm-plex-serif">
-              Horizon
-            </h1>
-          </div>
+          <Logo />
         </SidebarHeader>
 
         <SidebarContent className="bg-white">
