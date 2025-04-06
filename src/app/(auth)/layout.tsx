@@ -1,3 +1,4 @@
+import { Toaster } from "@/modules/core/components/ui/sonner"
 import Image from "next/image"
 
 const AuthLayout = ({children}: {children: React.ReactNode}) => {
@@ -15,6 +16,8 @@ const AuthLayout = ({children}: {children: React.ReactNode}) => {
             className="w-full  md:h-[450px] lg:h-[550px]"
         />
       </div>
+
+      <Toaster richColors position="bottom-center"/>
     </section>
   )
 }

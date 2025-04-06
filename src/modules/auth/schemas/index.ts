@@ -52,7 +52,7 @@ export const SignUpSchema = z.object({
   ssn: z
     .string()
     .length(4, { message: "SSN must be exactly 4 digits." })
-    .regex(/^\d{9}$/, { message: "SSN must contain only numbers." }),
+    .regex(/^\d{4}$/, { message: "SSN must contain only numbers." }),
 
   email: z
     .string({ message: "Email is required" })
@@ -67,16 +67,16 @@ export const SignUpSchema = z.object({
     })
     .min(7, { message: "Password must be at least 7 characters long." })
     .max(50, { message: "Password must be at most 50 characters long." })
-    .regex(/[A-Z]/, {
-      message: "Password must contain at least one uppercase letter.",
-    })
-    .regex(/[a-z]/, {
-      message: "Password must contain at least one lowercase letter.",
-    })
-    .regex(/[0-9]/, { message: "Password must contain at least one number." })
-    .regex(/[\W_]/, {
-      message: "Password must contain at least one special character.",
-    })
+    // .regex(/[A-Z]/, {
+    //   message: "Password must contain at least one uppercase letter.",
+    // })
+    // .regex(/[a-z]/, {
+    //   message: "Password must contain at least one lowercase letter.",
+    // })
+    // .regex(/[0-9]/, { message: "Password must contain at least one number." })
+    // .regex(/[\W_]/, {
+    //   message: "Password must contain at least one special character.",
+    // })
     .trim(),
 });
 export type SignUpSchema = z.infer<typeof SignUpSchema>;

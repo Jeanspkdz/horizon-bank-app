@@ -19,9 +19,14 @@ import {
   ScrollText,
   CreditCard,
   Handshake,
+  LogOut,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { Logo } from "./logo";
+import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
+import { getUserInitials } from "@/modules/auth/lib/util";
+import { Button } from "./ui/button";
+import { signOut } from "@/modules/auth/actions";
 
 const sidebarItems = [
   {
@@ -51,9 +56,18 @@ const sidebarItems = [
   },
 ];
 
-export const Sidebar = () => {
+interface SidebarProps {
+  username: string;
+  email: string;
+}
+
+export const Sidebar = ({ username, email }: SidebarProps) => {
   const pathname = usePathname();
   const isActive = (route: string) => pathname == route;
+
+  const handleSignOut = async () => {
+    await signOut();
+  };
 
   return (
     <section>
@@ -82,14 +96,34 @@ export const Sidebar = () => {
                       />
                       <span className="font-semibold">{label}</span>
                     </Link>
-                    {/* group/menu-item
-                    data-[active=true]:bg-blue-600 data-[active=true]:text-white */}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
           </SidebarGroup>
         </SidebarContent>
+
+        <SidebarFooter className="bg-white">
+          <div className="p-3 flex items-center justify-between">
+            <Avatar className="w-10 h-10">
+              <AvatarFallback>{getUserInitials(username)}</AvatarFallback>
+              <AvatarImage />
+            </Avatar>
+
+            <div className="flex flex-col gap-y-0.5">
+              <span className="font-semibold text-slate-700">{username}</span>
+              <span className="text-sm text-slate-600">{email}</span>
+            </div>
+
+            <Button
+              variant={"ghost"}
+              className="cursor-pointer"
+              onClick={handleSignOut}
+            >
+              <LogOut />
+            </Button>
+          </div>
+        </SidebarFooter>
 
         <SidebarRail />
       </ShadCnSidebar>

@@ -14,6 +14,10 @@ import {
 } from "@/modules/core/components/ui/form";
 import { Input } from "@/modules/core/components/ui/input";
 import { Button } from "@/modules/core/components/ui/button";
+import { signIn } from "@/modules/auth/actions";
+import { redirect } from "next/navigation";
+import { toast } from "sonner";
+import { Loader } from "lucide-react";
 
 function SignInPage() {
   const form = useForm<SignInSchema>({
@@ -24,9 +28,18 @@ function SignInPage() {
     },
   });
 
-  const onSubmit = (values: SignInSchema) => {
-    console.log(values);
-  }
+  const onSubmit = async (values: SignInSchema) => {
+    const response = await signIn(values);
+
+    if (response.success) {
+      toast.success("Sign In Successful");
+      return redirect("/");
+    }
+
+    console.log(response.error);
+
+    toast.error(response.error.message);
+  };
 
   return (
     <section className="max-w-10/12 md:max-w-[420px]">
@@ -38,7 +51,10 @@ function SignInPage() {
         altQuestionText="Dont'have an account?"
       >
         <Form {...form}>
-          <form className="flex flex-col gap-y-8" onSubmit={form.handleSubmit(onSubmit)}>
+          <form
+            className="flex flex-col gap-y-8"
+            onSubmit={form.handleSubmit(onSubmit)}
+          >
             <FormField
               control={form.control}
               name="email"
@@ -52,7 +68,7 @@ function SignInPage() {
                       className="focus-visible:ring-blue-200"
                     />
                   </FormControl>
-                  <FormMessage/>
+                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -65,17 +81,28 @@ function SignInPage() {
                   <FormLabel className="text-gray-600">Password</FormLabel>
                   <FormControl>
                     <Input
+                      type="password"
                       placeholder="Enter your password"
                       {...field}
                       className="focus-visible:ring-blue-200"
                     />
                   </FormControl>
-                  <FormMessage/>
+                  <FormMessage />
                 </FormItem>
               )}
             />
 
-            <Button type="submit" className="text-white bg-blue-500 capitalize hover:bg-blue-600 cursor-pointer transition-colors">Sign In</Button>
+            <Button
+              disabled={form.formState.isSubmitting}
+              type="submit"
+              className="text-white bg-blue-500 capitalize hover:bg-blue-600 cursor-pointer transition-colors"
+            >
+              {form.formState.isSubmitting ? (
+                <Loader className="animate-spin" />
+              ) : (
+                "Sign In"
+              )}
+            </Button>
           </form>
         </Form>
       </FormWrapper>

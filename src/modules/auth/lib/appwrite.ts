@@ -1,0 +1,39 @@
+"use server";
+
+import { Client, Account } from "node-appwrite";
+import { cookies } from "next/headers";
+import { APPWRITE_COOKIE_NAME } from "../consts";
+
+export async function createSessionClient() {
+  const client = new Client()
+    .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!!!!)
+    .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT!!!!);
+
+  const cookiesStore = await cookies()
+  const session = cookiesStore.get(APPWRITE_COOKIE_NAME)
+  if (!session || !session.value) {
+    console.log("[ERR_SESSION]", "No session found in cookies");
+    throw new Error("No session");
+  }
+
+  client.setSession(session.value);
+
+  return {
+    get account() {
+      return new Account(client);
+    },
+  };
+}
+
+export async function createAdminClient() {
+  const client = new Client()
+    .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!!!!)
+    .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT!!!!)
+    .setKey(process.env.NEXT_APPWRITE_KEY!!!!);
+
+  return {
+    get account() {
+      return new Account(client);
+    },
+  };
+}

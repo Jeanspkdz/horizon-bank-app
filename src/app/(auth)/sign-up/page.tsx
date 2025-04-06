@@ -1,6 +1,6 @@
 "use client";
 
-import { DatePicker } from "@/modules/auth/components/date-picker";
+import { getLoggedInUser, signUp } from "@/modules/auth/actions";
 import FormWrapper from "@/modules/auth/components/form-wrapper";
 import { SignUpSchema } from "@/modules/auth/schemas";
 import { Button } from "@/modules/core/components/ui/button";
@@ -14,7 +14,11 @@ import {
 } from "@/modules/core/components/ui/form";
 import { Input } from "@/modules/core/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader} from "lucide-react";
+import { redirect } from "next/navigation";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 function SignUpPage() {
   const form = useForm<SignUpSchema>({
@@ -27,13 +31,21 @@ function SignUpPage() {
       postalCode: "",
       dateOfBirth: "",
       ssn: "",
+      email: "",
+      password: "",
     },
   });
 
-  console.log(form.watch("dateOfBirth"));
+  const onSubmit = async (values: SignUpSchema) => {
+    
+    const response = await signUp(values);
 
-  const onSubmit = (values: SignUpSchema) => {
-    console.log(values);
+    if(response.success){
+      toast.success("Sign Up Successful")
+      return redirect("/")
+    }
+    console.log(response.error);
+    toast.error(response.error.message)
   };
 
   return (
@@ -210,6 +222,7 @@ function SignUpPage() {
                   <FormLabel className="text-gray-600">Password</FormLabel>
                   <FormControl>
                     <Input
+                      type="password"
                       placeholder="Enter your password"
                       {...field}
                       className="focus-visible:ring-blue-200"
@@ -221,10 +234,15 @@ function SignUpPage() {
             />
 
             <Button
+              disabled={form.formState.isSubmitting}
               type="submit"
               className="text-white bg-blue-500 capitalize hover:bg-blue-600 cursor-pointer transition-colors"
             >
-              Sign Up
+              {form.formState.isSubmitting ? (
+                <>
+                 <Loader className="animate-spin"/> 
+                </>
+              ): "Sign Up"}
             </Button>
           </form>
         </Form>

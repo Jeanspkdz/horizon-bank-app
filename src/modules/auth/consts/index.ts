@@ -1,0 +1,1 @@
+export const APPWRITE_COOKIE_NAME = "appwrite-session"
