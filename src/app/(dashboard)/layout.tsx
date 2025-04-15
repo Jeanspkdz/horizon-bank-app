@@ -1,4 +1,4 @@
-import { getLoggedInUser } from "@/modules/auth/actions";
+import { getLoggedInUser } from "@/modules/auth/actions/auth";
 import { Navbar } from "@/modules/core/components/navbar";
 import { Sidebar } from "@/modules/core/components/sidebar";
 import { SidebarProvider } from "@/modules/core/components/ui/sidebar";

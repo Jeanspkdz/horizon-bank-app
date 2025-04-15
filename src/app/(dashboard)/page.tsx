@@ -1,4 +1,4 @@
-import { getLoggedInUser } from "@/modules/auth/actions";
+import { getLoggedInUser } from "@/modules/auth/actions/auth";
 import { DoughnutChart } from "@/modules/core/components/doughnut-chart";
 import { Heading } from "@/modules/core/components/heading";
 import { RightSidebar } from "@/modules/core/components/right-sidebar";

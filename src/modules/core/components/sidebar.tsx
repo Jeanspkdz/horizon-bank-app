@@ -26,7 +26,7 @@ import { Logo } from "./logo";
 import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
 import { getUserInitials } from "@/modules/auth/lib/util";
 import { Button } from "./ui/button";
-import { signOut } from "@/modules/auth/actions";
+import { signOut } from "@/modules/auth/actions/auth";
 
 const sidebarItems = [
   {

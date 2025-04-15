@@ -1,14 +1,26 @@
 "use server";
 
-import { AppwriteException, ID, Models } from "node-appwrite";
-import { createAdminClient, createSessionClient } from "../lib/appwrite";
-import { SignInSchema, SignUpSchema } from "../schemas";
+import { AppwriteException, ID } from "node-appwrite";
 import { cookies } from "next/headers";
 import { CustomError, DefaultError } from "@/modules/core/errors";
-import { UserAlreadyExistsError, UserInvalidCredentialsError } from "../errors";
-import { APPWRITE_COOKIE_NAME } from "../consts";
-import { User } from "../types";
 import { Response } from "@/modules/core/types";
+import {
+  createAdminClient,
+  createSessionClient,
+} from "@/modules/core/lib/appwrite";
+import { SignInSchema, SignUpSchema } from "@/modules/auth/schemas/index";
+import { APPWRITE_COOKIE_NAME } from "@/modules/core/consts";
+import { User, UserCreateInput,  } from "@/modules/auth/types";
+import {
+  UserAlreadyExistsError,
+  UserInvalidCredentialsError,
+} from "@/modules/auth/errors/index";
+import { createDwollaCustomer } from "@/modules/bankConnection/actions/dwolla";
+import { VerifiedPersonalCustomer } from "@/modules/bankConnection/types";
+
+
+const { APPWRITE_DB, APPWRITE_USER_COLLECTION} =
+  process.env;
 
 export async function signUp({
   password,
@@ -27,31 +39,45 @@ export async function signUp({
       `${firstName} ${lastName}`
     );
 
-    // Use the Appwrite database service to store the new user data
-    const newUser: User = {
+    //Create Dwolla Customer
+    const dwollaCustomer: VerifiedPersonalCustomer = {
       ...values,
-      userId: newAccountUser.$id,
+      type: "personal",
+      address1: values["address"],
+    };
+    const dwollaCustomerUrl = await createDwollaCustomer(dwollaCustomer);
+
+    // Use the Appwrite database service to store the new user data
+    const newUser: UserCreateInput = {
+      ...values,
+      accountId: newAccountUser.$id,
+      dwollaCustomerUrl,
     };
 
-    await database.createDocument(
-      process.env.NEXT_APPWRITE_DB!!!!,
-      process.env.NEXT_APPWRITE_USER_COLLECTION!!!!,
+    const documentCreated = await database.createDocument(
+      APPWRITE_DB!!!!,
+      APPWRITE_USER_COLLECTION!!!!,
       ID.unique(),
       newUser
     );
+
+    const userCreated: User = {
+      id: documentCreated.$id,
+      ...newUser,
+    }
 
     const session = await account.createEmailPasswordSession(email, password);
 
     (await cookies()).set(APPWRITE_COOKIE_NAME, session.secret, {
       path: "/",
-      httpOnly: true, 
+      httpOnly: true,
       sameSite: "strict",
       secure: true,
     });
 
     return {
       success: true,
-      data: newUser,
+      data: userCreated,
     };
   } catch (err) {
     console.log("[ERR_SIGN_UP_ACTION]", err);
@@ -71,9 +97,7 @@ export async function signUp({
   }
 }
 
-export async function signIn(
-  values: SignInSchema
-): Promise<Response<null>> {
+export async function signIn(values: SignInSchema): Promise<Response<null>> {
   try {
     const { email, password } = values;
 
@@ -126,3 +150,4 @@ export async function getLoggedInUser() {
     return null;
   }
 }
+

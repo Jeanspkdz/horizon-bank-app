@@ -2,15 +2,15 @@
 
 import { Client, Account, Databases } from "node-appwrite";
 import { cookies } from "next/headers";
-import { APPWRITE_COOKIE_NAME } from "../consts";
+import { APPWRITE_COOKIE_NAME } from "@/modules/core/consts";
 
 export async function createSessionClient() {
   const client = new Client()
     .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!!!!)
     .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT!!!!);
 
-  const cookiesStore = await cookies()
-  const session = cookiesStore.get(APPWRITE_COOKIE_NAME)
+  const cookiesStore = await cookies();
+  const session = cookiesStore.get(APPWRITE_COOKIE_NAME);
   if (!session || !session.value) {
     console.log("[ERR_SESSION]", "No session found in cookies");
     throw new Error("No session");
@@ -35,8 +35,8 @@ export async function createAdminClient() {
     get account() {
       return new Account(client);
     },
-    get database(){
-      return new Databases(client)
-    }
+    get database() {
+      return new Databases(client);
+    },
   };
 }

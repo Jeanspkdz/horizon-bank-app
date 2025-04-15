@@ -15,6 +15,7 @@ export const SignUpSchema = z.object({
   lastName: z.string().min(1, { message: "A last name is required." }),
   address: z.string().min(1, { message: "An address is required." }),
 
+  city: z.string().min(1, { message: "A city is required." }),
   state: z
     .string()
     .length(2, {

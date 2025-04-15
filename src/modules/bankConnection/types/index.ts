@@ -1,0 +1,32 @@
+import { z} from "zod"
+import { LinkTokenCreateResponse } from "plaid";
+
+const BankConnection = z.object({
+  id: z.string(),
+  userId: z.string(), 
+  accessToken: z.string(), //Plaid
+  itemId: z.string(), //Plaid
+  fundingSourceUrl: z.string(), //Dwolla
+})
+export const BankConnectionCreateInput = BankConnection.partial({id: true})
+
+export type BankConnection = z.infer<typeof BankConnection>
+export type BankConnectionCreateInput = z.infer<typeof BankConnectionCreateInput>
+
+
+//Plaid
+export type LinkToken = LinkTokenCreateResponse["link_token"];
+
+//Dwolla
+export type VerifiedPersonalCustomer = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  type: string;
+  address1: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  dateOfBirth: string;
+  ssn: string;
+};

@@ -14,7 +14,7 @@ import {
 } from "@/modules/core/components/ui/form";
 import { Input } from "@/modules/core/components/ui/input";
 import { Button } from "@/modules/core/components/ui/button";
-import { signIn } from "@/modules/auth/actions";
+import { signIn } from "@/modules/auth/actions/auth";
 import { redirect } from "next/navigation";
 import { toast } from "sonner";
 import { Loader } from "lucide-react";
