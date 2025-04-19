@@ -41,11 +41,11 @@ export const RightSidebar = ({ username, email }: RightSidebarProps) => {
 
           <div className="mt-6 relative h-full">
             <div className="z-20 w-11/12 relative">
-              <CreditCard username={username} />
+              <CreditCard username={username} className="w-full" />
             </div>
 
             <div className="z-10 absolute top-[15%] left-[10%] w-11/12">
-              <CreditCard username={username} />
+              <CreditCard username={username} className="w-full"/>
             </div>
           </div>
         </div>

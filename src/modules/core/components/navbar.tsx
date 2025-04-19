@@ -8,7 +8,7 @@ export const Navbar = () => {
   const { toggleSidebar, ...props } = useSidebar();
 
   return (
-    <header className="block md:hidden bg-white sticky self-start top-0 left-0 w-full py-4 px-5 shadow-md">
+    <header className="block md:hidden bg-white z-10 sticky self-start top-0 left-0 w-full py-4 px-5 shadow-md">
       <nav className="flex justify-between items-center">
         <Image
           src={"/images/logo.svg"}

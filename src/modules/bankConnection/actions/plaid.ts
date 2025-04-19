@@ -13,8 +13,9 @@ import { BankConnection, BankConnectionCreateInput, LinkToken } from "@/modules/
 import { linkBankAccountWithDwolla } from "@/modules/bankConnection/actions/dwolla";
 import { Response } from "@/modules/core/types";
 import { DefaultError } from "@/modules/core/errors";
-import { createBankAccount } from "@/modules/bankConnection/actions/bank";
+import { createBankConnection } from "@/modules/bankConnection/actions/bank";
 import { User } from "@/modules/auth/types";
+import { getBankAccount } from "@/modules/bankAccounts/actions";
 
 export async function createLinkToken(
   user: User
@@ -101,20 +102,6 @@ export async function createProcessorToken({
   }
 }
 
-export async function getBankAccountInfo(accessToken: string) {
-  try {
-    const userAccountResponse = await plaidClient.accountsGet({
-      access_token: accessToken,
-    });
-    const account = userAccountResponse.data.accounts[0];
-
-    return account;
-  } catch (error) {
-    console.log("[ERR_GET_BANK_ACCOUNT_INFO]", error);
-    throw new DefaultError("Something went wrong");
-  }
-}
-
 interface SetUpBankAccountIntegrationRequest {
   publicToken: string;
   user: User;
@@ -127,7 +114,7 @@ export async function setUpBankAccountIntegration({
     const { accessToken, itemId } = await exchangePublicToken({ publicToken });
 
     // Just one account since Single Account is enabled in plaid dashboard
-    const account = await getBankAccountInfo(accessToken);
+    const account = await getBankAccount(accessToken);
 
     //Create processor token
     const processorToken = await createProcessorToken({
@@ -148,7 +135,7 @@ export async function setUpBankAccountIntegration({
       itemId: itemId,// Plaid
       fundingSourceUrl: fundingSourceUrl, // Dwolla
     };
-    await createBankAccount(bank);
+    await createBankConnection(bank);
 
     console.log("BANK CREATED");
 

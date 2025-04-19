@@ -1,16 +1,35 @@
 import Image from "next/image";
+import { cn } from "../lib/utils";
+import { formatMoney } from "../lib/format";
 
 interface CreditCardProps {
   username: string;
+  balance: number | string;
+  name: string;
+  currency: string;
+  className?: string;
 }
 
-export const CreditCard = ({ username }: CreditCardProps) => {
+export const CreditCard = ({
+  username,
+  balance,
+  name,
+  currency,
+  className,
+}: CreditCardProps) => {
   return (
-    <article className="flex h-[190px] rounded-xl overflow-hidden border-b border-r border-white">
+    <article
+      className={cn(
+        "flex aspect-[32/19] min-h-[190px] max-w-[280px] md:max-w-[320px] lg:max-w-[360px] rounded-xl overflow-hidden border-b border-r border-white relative z-[5]",
+        className
+      )}
+    >
       <div className="flex-9/12 bg-linear-to-r from-[#0179FE]  to-[#4893FF] flex flex-col justify-between text-white font-semibold p-5">
         <div className="font-bold">
-          <span className="block">{username}</span>
-          <span className="font-ibm-plex-serif">$123.50</span>
+          <span className="block">{name}</span>
+          <span className="font-ibm-plex-serif">
+            {typeof balance == "number" ? `${formatMoney(balance, currency)}` : balance}
+          </span>
         </div>
 
         <div>

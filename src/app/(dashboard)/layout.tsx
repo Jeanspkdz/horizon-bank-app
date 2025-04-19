@@ -19,11 +19,11 @@ const DashboardLayout = async ({
 
       <main className="w-full h-full flex">
         <Sidebar 
-          username={user.name}
+          username={`${user?.firstName} ${user?.lastName}`}
           email={user.email}
         />
 
-        <div className="flex-1">{children}</div>
+        <section className="flex-1">{children}</section>
       </main>
     </SidebarProvider>
   );

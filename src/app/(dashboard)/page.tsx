@@ -6,11 +6,10 @@ import { RightSidebar } from "@/modules/core/components/right-sidebar";
 const HomePage = async () => {
   const user = await getLoggedInUser()
   console.log(user);
-  
 
   return (
     <div className="flex w-full h-full">
-      <div className="p-5 flex-1">
+      <div className="flex-1 p-5">
         <div className="mb-8">
           <Heading
             type="greeting"
@@ -29,7 +28,7 @@ const HomePage = async () => {
       <div className="hidden lg:block">
         <RightSidebar 
           email={user!.email}
-          username={user!.name}
+          username={`${user?.firstName} ${user?.lastName}`}
         />
       </div>
     </div>

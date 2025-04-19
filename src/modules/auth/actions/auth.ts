@@ -1,6 +1,6 @@
 "use server";
 
-import { AppwriteException, ID } from "node-appwrite";
+import { AppwriteException, ID, Query } from "node-appwrite";
 import { cookies } from "next/headers";
 import { CustomError, DefaultError } from "@/modules/core/errors";
 import { Response } from "@/modules/core/types";
@@ -10,7 +10,7 @@ import {
 } from "@/modules/core/lib/appwrite";
 import { SignInSchema, SignUpSchema } from "@/modules/auth/schemas/index";
 import { APPWRITE_COOKIE_NAME } from "@/modules/core/consts";
-import { User, UserCreateInput,  } from "@/modules/auth/types";
+import { User, UserCreateInput } from "@/modules/auth/types";
 import {
   UserAlreadyExistsError,
   UserInvalidCredentialsError,
@@ -18,9 +18,7 @@ import {
 import { createDwollaCustomer } from "@/modules/bankConnection/actions/dwolla";
 import { VerifiedPersonalCustomer } from "@/modules/bankConnection/types";
 
-
-const { APPWRITE_DB, APPWRITE_USER_COLLECTION} =
-  process.env;
+const { APPWRITE_DB, APPWRITE_USER_COLLECTION } = process.env;
 
 export async function signUp({
   password,
@@ -64,7 +62,7 @@ export async function signUp({
     const userCreated: User = {
       id: documentCreated.$id,
       ...newUser,
-    }
+    };
 
     const session = await account.createEmailPasswordSession(email, password);
 
@@ -144,10 +142,35 @@ export async function signOut() {
 export async function getLoggedInUser() {
   try {
     const { account } = await createSessionClient();
+    const { database } = await createAdminClient();
+    const userAccount = await account.get();
 
-    return await account.get();
+    const documentResponse = await database.listDocuments(
+      APPWRITE_DB!!,
+      APPWRITE_USER_COLLECTION!!,
+      [Query.equal("accountId", userAccount.$id)]
+    );
+
+    const userDocument = documentResponse.documents[0];
+
+    const user: User = {
+      id: userDocument.$id,
+      firstName: userDocument["firstName"],
+      lastName: userDocument["lastName"],
+      email: userDocument["email"],
+      address: userDocument["address"],
+      city: userDocument["city"],
+      dateOfBirth: userDocument["dateOfBirth"],
+      postalCode: userDocument["postalCode"],
+      ssn: userDocument["ssn"],
+      state: userDocument["state"],
+      dwollaCustomerUrl: userDocument["dwollaCustomerUrl"],
+      accountId: userDocument["accountId"],
+    };
+
+    return user
+
   } catch (error) {
     return null;
   }
 }
-

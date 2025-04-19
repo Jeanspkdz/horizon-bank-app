@@ -17,14 +17,14 @@ export const Heading = (props: HeadingProps) => {
   return (
     <>
       {props.type == "greeting" && (
-        <h2 className="font-bold text-3xl">
+        <h1 className="font-bold text-3xl">
           {props.title} <span className="text-sky-500">{props.name}</span>
-        </h2>
+        </h1>
       ) }
 
       {
         props.type == "default" && (
-          <h2>{props.title}</h2>
+          <h1 className="font-bold text-3xl">{props.title}</h1>
         )
       }
 
