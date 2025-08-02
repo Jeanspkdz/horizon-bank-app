@@ -4,13 +4,17 @@ import { CreditCard } from "@/modules/core/components/credit-card";
 import { Heading } from "@/modules/core/components/heading";
 
 async function MyBanksPage() {
-  const user = await getLoggedInUser();
-  const response = await getBankAccounts(user?.id!!);
+  const userResponse = await getLoggedInUser();
 
-  if (response.success) {
-    console.log({
-      userBanks: response.data,
-    });
+  if (!userResponse.success) {
+    throw userResponse.error;
+  }
+
+  const user = userResponse.data
+  const bankAccountsResponse = await getBankAccounts(user.id);
+
+  if (!bankAccountsResponse.success) {
+    throw bankAccountsResponse.error
   }
 
   return (
@@ -24,9 +28,9 @@ async function MyBanksPage() {
       <div className="mt-10 h-full @container">
         <h2 className="font-bold">Your Cards</h2>
 
-        {response.success ? (
+        {bankAccountsResponse.data.length > 0 ? (
           <div className="flex flex-wrap gap-4 mt-6">
-            {response.data.map((account) => (
+            {bankAccountsResponse.data.map((account) => (
               <CreditCard
                 key={account.account_id}
                 username={`${user?.firstName} ${user?.lastName}`}

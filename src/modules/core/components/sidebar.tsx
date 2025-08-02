@@ -70,7 +70,7 @@ export const Sidebar = ({ username, email }: SidebarProps) => {
   };
 
   return (
-    <section>
+    <nav>
       <ShadCnSidebar>
         <SidebarHeader className="bg-white p-5">
           <Logo />
@@ -127,6 +127,6 @@ export const Sidebar = ({ username, email }: SidebarProps) => {
 
         <SidebarRail />
       </ShadCnSidebar>
-    </section>
+    </nav>
   );
 };

@@ -1,11 +1,16 @@
-import { getLoggedInUser } from "@/modules/auth/actions/auth";
+import { getLoggedInUser} from "@/modules/auth/actions/auth";
 import { DoughnutChart } from "@/modules/core/components/doughnut-chart";
 import { Heading } from "@/modules/core/components/heading";
 import { RightSidebar } from "@/modules/core/components/right-sidebar";
-
+ 
 const HomePage = async () => {
-  const user = await getLoggedInUser()
-  console.log(user);
+  const response = await getLoggedInUser()
+
+  if(!response.success){
+      throw response.error
+  }
+
+  const user = response.data
 
   return (
     <div className="flex w-full h-full">
@@ -15,7 +20,7 @@ const HomePage = async () => {
             type="greeting"
             title="Welcome"
             subtitle="Access and manage your account and transactions efficiently"
-            name={user!.name}
+            name={`${user?.firstName} ${user?.lastName}`}
           />
         </div>
 

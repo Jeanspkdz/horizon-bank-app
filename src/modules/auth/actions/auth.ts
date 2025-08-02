@@ -2,7 +2,7 @@
 
 import { AppwriteException, ID, Query } from "node-appwrite";
 import { cookies } from "next/headers";
-import { CustomError, DefaultError } from "@/modules/core/errors";
+import { CustomError, DefaultError, UnexpectedError } from "@/modules/core/errors";
 import { Response } from "@/modules/core/types";
 import {
   createAdminClient,
@@ -45,7 +45,7 @@ export async function signUp({
     };
     const dwollaCustomerUrl = await createDwollaCustomer(dwollaCustomer);
 
-    // Use the Appwrite database service to store the new user data
+    // Use Appwrite database service to store the new user data
     const newUser: UserCreateInput = {
       ...values,
       accountId: newAccountUser.$id,
@@ -64,6 +64,7 @@ export async function signUp({
       ...newUser,
     };
 
+    // Once the user is created, set a new session
     const session = await account.createEmailPasswordSession(email, password);
 
     (await cookies()).set(APPWRITE_COOKIE_NAME, session.secret, {
@@ -113,7 +114,7 @@ export async function signIn(values: SignInSchema): Promise<Response<null>> {
     return {
       success: true,
       data: null,
-    };
+    }; 
   } catch (error) {
     console.log("[ERR_SIGN_IN_ACTION]", error);
 
@@ -132,14 +133,14 @@ export async function signIn(values: SignInSchema): Promise<Response<null>> {
   }
 }
 
-export async function signOut() {
+export async function signOut() : Promise<void> {
   const { account } = await createSessionClient();
 
   (await cookies()).delete(APPWRITE_COOKIE_NAME);
   await account.deleteSession("current");
 }
 
-export async function getLoggedInUser() {
+export async function getLoggedInUser() : Promise<Response<User>> {
   try {
     const { account } = await createSessionClient();
     const { database } = await createAdminClient();
@@ -168,9 +169,17 @@ export async function getLoggedInUser() {
       accountId: userDocument["accountId"],
     };
 
-    return user
+    return  {
+      success: true,
+      data: user
+    }
 
   } catch (error) {
-    return null;
+    //Handle Expected Exceptions
+
+    return {
+      success: false,
+      error: new UnexpectedError()
+    }
   }
 }

@@ -10,7 +10,7 @@ import { AccountBase } from "plaid";
 
 const { APPWRITE_BANK_COLLECTION, APPWRITE_DB } = process.env;
 
-export async function getBankAccounts(userId: string): Promise<Response<AccountBase[]>> {
+export async function getBankAccounts(userId: string): Promise<AccountBase[]> {
   try {
     const bankConnections = await getBankConnectionsById(userId);
     const financialUserAccounts = await Promise.all(
@@ -18,15 +18,10 @@ export async function getBankAccounts(userId: string): Promise<Response<AccountB
         getBankAccount(bankConnection.accessToken)
       )
     );
-    return {
-      success: true,
-      data: financialUserAccounts   
-    }
+    return financialUserAccounts
   } catch (error) {
-    return {
-      success: false,
-      error: new DefaultError("Something went wrong")
-    }
+    console.log("[ERR_GET_BANK_ACCOUNTS]", error);
+    throw new DefaultError("Error on fetching bank accounts");
   }
 }
 
@@ -41,7 +36,7 @@ export async function getBankConnectionsById(
       [Query.equal("userId", userId)]
     );
     const bankConnections: BankConnection[] = documentsResponse.documents.map(
-      (doc) => ({
+      (doc): BankConnection => ({
         id: doc.$id,
         userId: doc.userId,
         accessToken: doc.accessToken,

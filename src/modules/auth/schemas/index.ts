@@ -6,7 +6,7 @@ export const SignInSchema = z.object({
     .string()
     .min(1, { message: "Email is required" })
     .email({ message: "Please enter a valid email address." }),
-  password: z.string().min(1, { message: "Password is required" }),
+  password: z.string().min(7, { message: "A valid password is required" }),
 });
 export type SignInSchema = z.infer<typeof SignInSchema>;
 

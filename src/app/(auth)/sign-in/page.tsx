@@ -37,7 +37,6 @@ function SignInPage() {
     }
 
     console.log(response.error);
-
     toast.error(response.error.message);
   };
 

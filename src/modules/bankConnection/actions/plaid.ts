@@ -9,8 +9,12 @@ import {
   ProcessorTokenCreateRequestProcessorEnum,
 } from "plaid";
 import { plaidClient } from "@/modules/bankConnection/lib/plaid";
-import { BankConnection, BankConnectionCreateInput, LinkToken } from "@/modules/bankConnection/types";
-import { linkBankAccountWithDwolla } from "@/modules/bankConnection/actions/dwolla";
+import {
+  BankConnection,
+  BankConnectionCreateInput,
+  LinkToken,
+} from "@/modules/bankConnection/types";
+import { getFundingSource } from "@/modules/bankConnection/actions/dwolla";
 import { Response } from "@/modules/core/types";
 import { DefaultError } from "@/modules/core/errors";
 import { createBankConnection } from "@/modules/bankConnection/actions/bank";
@@ -27,7 +31,7 @@ export async function createLinkToken(
     user: {
       client_user_id: user.accountId,
     },
-    products: ["auth"] as Products[],
+    products: [Products.Auth, Products.Transactions] as Products[],
   } satisfies LinkTokenCreateRequest;
 
   try {
@@ -122,7 +126,8 @@ export async function setUpBankAccountIntegration({
       accountId: account.account_id,
     });
 
-    const fundingSourceUrl = await linkBankAccountWithDwolla({
+    // Represents a bank account linked to a customer, used as a source or destination for transactions.
+    const fundingSourceUrl = await getFundingSource({
       customerId: user.dwollaCustomerUrl.split("/").pop() as string,
       processorToken,
       bankName: account.name,
@@ -132,7 +137,7 @@ export async function setUpBankAccountIntegration({
     const bank: BankConnectionCreateInput = {
       userId: user.id,
       accessToken, // Plaid
-      itemId: itemId,// Plaid
+      itemId: itemId, // Plaid
       fundingSourceUrl: fundingSourceUrl, // Dwolla
     };
     await createBankConnection(bank);

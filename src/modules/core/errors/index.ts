@@ -10,3 +10,10 @@ export class DefaultError extends CustomError {
     this.name = "DefaultError"
   } 
 }
+
+export class UnexpectedError extends CustomError {
+  constructor(){
+    super("An unexpected error occurred")
+    this.name = "UnexpectedError"
+  }
+}

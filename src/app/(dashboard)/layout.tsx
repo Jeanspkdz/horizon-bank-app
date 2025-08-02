@@ -8,22 +8,25 @@ const DashboardLayout = async ({
   children,
 }: Readonly<{ children: React.ReactNode }>) => {
 
-  const user = await getLoggedInUser()
-  if(!user){
+  const response = await getLoggedInUser()
+  
+  if(!response.success){
     return redirect("/sign-in")
   }
+  
+  const user = response.data
 
   return (
     <SidebarProvider className="block">
       <Navbar />
 
-      <main className="w-full h-full flex">
+      <main className="w-full min-h-svh flex">
         <Sidebar 
-          username={`${user?.firstName} ${user?.lastName}`}
+          username={`${user.firstName} ${user.lastName}`}
           email={user.email}
         />
 
-        <section className="flex-1">{children}</section>
+        <section className="flex-1 bg-[#FCFCFD]">{children}</section>
       </main>
     </SidebarProvider>
   );
