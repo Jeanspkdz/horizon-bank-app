@@ -6,7 +6,6 @@ const BankConnection = z.object({
   userId: z.string(), 
   accessToken: z.string(), //Plaid
   itemId: z.string(), //Plaid
-  fundingSourceUrl: z.string(), //Dwolla
 })
 export const BankConnectionCreateInput = BankConnection.partial({id: true})
 

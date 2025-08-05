@@ -96,7 +96,7 @@ interface LinkBankAccountWithDwollaOptions {
   customerId: string;
   bankName: string;
 }
-export async function getFundingSource({
+export async function generateFundingSource({
   processorToken,
   customerId,
   bankName,

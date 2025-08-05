@@ -11,11 +11,8 @@ async function MyBanksPage() {
   }
 
   const user = userResponse.data
-  const bankAccountsResponse = await getBankAccounts(user.id);
-
-  if (!bankAccountsResponse.success) {
-    throw bankAccountsResponse.error
-  }
+  const bankAccounts = await getBankAccounts(user.id);
+  console.log(bankAccounts);
 
   return (
     <div className="p-5">
@@ -28,15 +25,15 @@ async function MyBanksPage() {
       <div className="mt-10 h-full @container">
         <h2 className="font-bold">Your Cards</h2>
 
-        {bankAccountsResponse.data.length > 0 ? (
+        {bankAccounts.length > 0 ? (
           <div className="flex flex-wrap gap-4 mt-6">
-            {bankAccountsResponse.data.map((account) => (
+            {bankAccounts.map((account) => (
               <CreditCard
-                key={account.account_id}
+                key={account.id}
                 username={`${user?.firstName} ${user?.lastName}`}
                 name={account.name}
-                balance={account.balances.available ?? "No balance available" }
-                currency={account.balances.iso_currency_code ?? "USD"}
+                balance={account.balance ?? "No balance available" }
+                currency={"USD"}
               />
             ))}
           </div>

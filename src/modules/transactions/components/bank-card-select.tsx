@@ -15,9 +15,9 @@ interface BankCardSelectProps {
   value: string;
   onValueChange: (value: string) => void;
   bankAccounts: {
-    account_id: string;
+    accountId: string;
     name: string;
-    balances: { available: number | null };
+    balance: number 
   }[];
 }
 
@@ -33,14 +33,14 @@ export const BankCardSelect = ({bankAccounts, value, onValueChange}: BankCardSel
           <SelectLabel>Select a Bank to Display</SelectLabel>
           {bankAccounts.map((bankAccount) => (
             <SelectItem
-              value={bankAccount.account_id}
-              key={bankAccount.account_id}
+              value={bankAccount.accountId}
+              key={bankAccount.accountId}
               className="px-6"
             >
               <div className="font-semibold">
                 <SelectItemText>{bankAccount.name}</SelectItemText>
                 <span className="block text-xs text-blue-400">
-                  {formatMoney(bankAccount.balances.available ?? 0, "USD")}
+                  {formatMoney(bankAccount.balance, "USD")}
                 </span>
               </div>
             </SelectItem>

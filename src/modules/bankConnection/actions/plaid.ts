@@ -1,25 +1,27 @@
 "use server";
 
+import { User } from "@/modules/auth/types";
 import {
-  CountryCode,
-  Products,
-  LinkTokenCreateRequest,
-  ItemPublicTokenExchangeRequest,
-  ProcessorTokenCreateRequest,
-  ProcessorTokenCreateRequestProcessorEnum,
-} from "plaid";
+  createBankAccount,
+  getBankAccountsFromPlaid,
+} from "@/modules/bankAccounts/actions";
+import { createBankConnection } from "@/modules/bankConnection/actions/bank-connection";
+import { generateFundingSource } from "@/modules/bankConnection/actions/dwolla";
 import { plaidClient } from "@/modules/bankConnection/lib/plaid";
 import {
-  BankConnection,
   BankConnectionCreateInput,
-  LinkToken,
+  LinkToken
 } from "@/modules/bankConnection/types";
-import { getFundingSource } from "@/modules/bankConnection/actions/dwolla";
-import { Response } from "@/modules/core/types";
 import { DefaultError } from "@/modules/core/errors";
-import { createBankConnection } from "@/modules/bankConnection/actions/bank";
-import { User } from "@/modules/auth/types";
-import { getBankAccount } from "@/modules/bankAccounts/actions";
+import { Response } from "@/modules/core/types";
+import {
+  CountryCode,
+  ItemPublicTokenExchangeRequest,
+  LinkTokenCreateRequest,
+  ProcessorTokenCreateRequest,
+  ProcessorTokenCreateRequestProcessorEnum,
+  Products,
+} from "plaid";
 
 export async function createLinkToken(
   user: User
@@ -117,32 +119,43 @@ export async function setUpBankAccountIntegration({
   try {
     const { accessToken, itemId } = await exchangePublicToken({ publicToken });
 
-    // Just one account since Single Account is enabled in plaid dashboard
-    const account = await getBankAccount(accessToken);
-
-    //Create processor token
-    const processorToken = await createProcessorToken({
-      accessToken,
-      accountId: account.account_id,
-    });
-
-    // Represents a bank account linked to a customer, used as a source or destination for transactions.
-    const fundingSourceUrl = await getFundingSource({
-      customerId: user.dwollaCustomerUrl.split("/").pop() as string,
-      processorToken,
-      bankName: account.name,
-    });
-
     // Store Bank Account in Appwrite DB
     const bank: BankConnectionCreateInput = {
       userId: user.id,
       accessToken, // Plaid
       itemId: itemId, // Plaid
-      fundingSourceUrl: fundingSourceUrl, // Dwolla
     };
-    await createBankConnection(bank);
+    const bankConnectionCreated = await createBankConnection(bank);
+    console.log("BANK CONNECTION CREATED");
 
-    console.log("BANK CREATED");
+    const accounts = await getBankAccountsFromPlaid(accessToken);
+
+    for (const account of accounts) {
+      //Create processor token
+      const processorToken = await createProcessorToken({
+        accessToken,
+        accountId: account.account_id,
+      });
+
+      // Represents a bank account linked to a customer, used as a source or destination for transactions.
+      const fundingSourceUrl = await generateFundingSource({
+        customerId: user.dwollaCustomerUrl.split("/").pop() as string,
+        processorToken,
+        bankName: account.name,
+      });
+
+      //Store in Appwrite DB
+      await createBankAccount({
+        name: account.name,
+        officialName: account.official_name ?? account.name,
+        type: account.type,
+        subtype: account.subtype ?? "unknown",
+        fundingSourceUrl,
+        accountId: account.account_id,
+        balance: account.balances.available ?? account.balances.current ?? 0,
+        bankConnectionId: bankConnectionCreated.id,
+      });
+    }
 
     return {
       success: true,
