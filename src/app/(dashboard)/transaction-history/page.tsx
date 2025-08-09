@@ -1,6 +1,6 @@
 
 import { getLoggedInUser } from "@/modules/auth/actions/auth";
-import { getBankAccounts } from "@/modules/bankAccounts/actions";
+import { getBankAccountsByUser } from "@/modules/bankAccounts/actions";
 import { TransactionPanel } from "@/modules/transactions/components/transaction-panel";
 import { TransactionPanelSkeleton } from "@/modules/transactions/components/transaction-panel-skeleton";
 import { Suspense } from "react";
@@ -11,8 +11,13 @@ async function TransactionHistoryPage() {
     throw user.error;
   }
 
-  const bankAccountsPromise =  getBankAccounts(user.data.id);
-  
+  const bankAccountsPromise =  getBankAccountsByUser({
+    userId: user.data.id,
+    include: {
+      bankConnection: true
+    }
+  });
+
   return (
    <Suspense fallback={<TransactionPanelSkeleton/>}>
       <TransactionPanel  

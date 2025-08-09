@@ -1,24 +1,55 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
 import { Heading } from "@/modules/core/components/heading";
+import { use, useEffect, useState } from "react";
 
+import {
+  BankAccount,
+  BankAccountWithInclude,
+} from "@/modules/bankAccounts/types";
 import { SummaryCard } from "@/modules/transactions/components/summary-card";
-import { Banana, CreditCard } from "lucide-react";
-import { AccountBase } from "plaid";
-import { formatMoney } from "@/modules/core/lib/format";
 import { BankCardSelect } from "./bank-card-select";
-import { BankAccount } from "@/modules/bankAccounts/types";
+import { getBankTransactionsByAccount } from "../actions";
+import { BankConnection } from "@/modules/bankConnection/types";
 
-interface TransactionPanelProps{
-  bankAccountsPromise: Promise<BankAccount[]>
+interface TransactionPanelProps {
+  bankAccountsPromise: Promise<
+    (BankAccount & { bankConnection: BankConnection })[]
+  >;
 }
 
-export const TransactionPanel = ({bankAccountsPromise}: TransactionPanelProps) => {
-  const bankAccounts = use(bankAccountsPromise)
+export const TransactionPanel = ({
+  bankAccountsPromise,
+}: TransactionPanelProps) => {
+  const bankAccounts = use(bankAccountsPromise);
   const [bankAccountId, setBankAccountId] = useState(bankAccounts[0].accountId);
-  const selectedBankAccount = bankAccounts.find(bankAccount => bankAccount.accountId === bankAccountId) as BankAccount
+  const selectedBankAccount = bankAccounts.find(
+    (bankAccount) => bankAccount.accountId === bankAccountId
+  )!!!!;
 
+  const [isLoading, setIsLoading] = useState(false);
+
+  console.log(selectedBankAccount);
+
+  useEffect(() => {
+
+    const fetchTransactions = async () => {
+      try {
+        setIsLoading(true)
+        const transactions = await getBankTransactionsByAccount({
+          accessToken: selectedBankAccount.bankConnection.accessToken,
+          accountId: selectedBankAccount.accountId,
+        });
+        console.log("Transactions:" ,transactions)
+      } catch (error) {
+        console.log("[ERR_FETCHING_TRANSACTIOS]", error )
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchTransactions();
+
+  }, [bankAccountId, selectedBankAccount]);
 
   return (
     <div className="p-5">
@@ -49,7 +80,13 @@ export const TransactionPanel = ({bankAccountsPromise}: TransactionPanelProps) =
         <div>
           <h2 className="font-semibold mt-5">Transaction History</h2>
 
-          
+          {isLoading ? (
+            <p>Loading....</p>
+          ) : (
+            <div>
+              Transactions
+            </div>
+          )}
         </div>
       </div>
     </div>

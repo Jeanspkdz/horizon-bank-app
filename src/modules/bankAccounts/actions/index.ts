@@ -3,7 +3,9 @@
 import {
   BankAccount,
   BankAccountCreateInput,
+  BankAccountIncludeOptions,
   BankAccountUpdateInput,
+  BankAccountWithInclude,
 } from "@/modules/bankAccounts/types";
 import { getBankConnectionsByUserId } from "@/modules/bankConnection/actions/bank-connection";
 import { plaidClient } from "@/modules/bankConnection/lib/plaid";
@@ -14,16 +16,24 @@ import { ID, Query } from "node-appwrite";
 
 const { APPWRITE_DB, APPWRITE_BANK_ACCOUNT_COLLECTION } = process.env;
 
-export async function getBankAccounts(userId: string): Promise<BankAccount[]> {
+
+export async function getBankAccountsByUser<T extends BankAccountIncludeOptions>({
+  userId,
+  include
+}: {userId: string , include? : T}) : Promise<BankAccountWithInclude<T>[]> {
   try {
     const bankConnections = await getBankConnectionsByUserId(userId);
     const financialUserBankAccounts = await Promise.all(
       bankConnections.map((bankConnection: BankConnection) =>
-        getBankAccountsByBankConnection(bankConnection.id)
+        getBankAccountsByBankConnection({
+          bankConnectionId: bankConnection.id,
+          include,
+        })
       )
     );
 
-    return financialUserBankAccounts.flat(2);
+
+    return financialUserBankAccounts.flat(1);
   } catch (error) {
     console.log("[ERR_GET_BANK_ACCOUNTS]", error);
     throw new DefaultError("Error on fetching bank accounts");
@@ -33,37 +43,41 @@ export async function getBankAccounts(userId: string): Promise<BankAccount[]> {
 export async function updateBankAccountBalanceByUser(userId: string) {
   try {
     //Get BankConnectionByUser
-  const bankConnections = await getBankConnectionsByUserId(userId);
+    const bankConnections = await getBankConnectionsByUserId(userId);
 
-  for (const bankConnection of bankConnections) {
-     const [bankAccounts, response] = await Promise.all([
-        getBankAccountsByBankConnection(bankConnection.id),
-        plaidClient.accountsBalanceGet({ access_token: bankConnection.accessToken })
+    for (const bankConnection of bankConnections) {
+      const [bankAccounts, response] = await Promise.all([
+        getBankAccountsByBankConnection({
+          bankConnectionId: bankConnection.id,
+        }),
+        plaidClient.accountsBalanceGet({
+          access_token: bankConnection.accessToken,
+        }),
       ]);
 
-    const accounts = response.data.accounts;
+      const accounts = response.data.accounts;
 
-    // Update balance on each account
-    await Promise.all(
-      accounts.map((account) => {
-        const bankAccountMatched = bankAccounts.find(
-          (bankAccount) => bankAccount.accountId == account.account_id
-        );
+      // Update balance on each account
+      await Promise.all(
+        accounts.map((account) => {
+          const bankAccountMatched = bankAccounts.find(
+            (bankAccount) => bankAccount.accountId == account.account_id
+          );
 
-        if (bankAccountMatched == null) return Promise.resolve(); 
+          if (bankAccountMatched == null) return Promise.resolve();
 
-        return updateBankAccount({
-          id: bankAccountMatched.id,
-          data: {
-            balance:
-              account.balances.available ?? account.balances.current ?? 0,
-          },
-        });
-      })
-    );
-  }
+          return updateBankAccount({
+            id: bankAccountMatched.id,
+            data: {
+              balance:
+                account.balances.available ?? account.balances.current ?? 0,
+            },
+          });
+        })
+      );
+    }
   } catch (error) {
-     console.log("[ERR_UPDATE_BANK_ACCOUNTS_BALANCE]", error);
+    console.log("[ERR_UPDATE_BANK_ACCOUNTS_BALANCE]", error);
     throw new DefaultError("Error on updating balance");
   }
 }
@@ -147,19 +161,27 @@ export async function getBankAccountsFromPlaid(accessToken: string) {
   }
 }
 
-export async function getBankAccountsByBankConnection(
-  bankConnectionId: string
-): Promise<BankAccount[]> {
+//Function Overload
+// export async function getBankAccountsByBankConnection(
+//   params: { bankConnectionId: string }
+// ): Promise<BankAccount[]>;
+// export async function getBankAccountsByBankConnection(
+//    params: { bankConnectionId: string; include: { bankConnection: boolean } }
+// ): Promise<BankAccountWithBankConnection[]>;
+
+export async function getBankAccountsByBankConnection<T extends BankAccountIncludeOptions>(
+  params: { bankConnectionId: string; include?: T}
+) : Promise<BankAccountWithInclude<T>[]>{
   try {
     const { database } = await createAdminClient();
     const documentsList = await database.listDocuments(
       APPWRITE_DB!!,
       APPWRITE_BANK_ACCOUNT_COLLECTION!!,
-      [Query.equal("bankConnectionId", bankConnectionId)]
+      [Query.equal("bankConnectionId", params.bankConnectionId)]
     );
     const bankAccountsDocuments = documentsList.documents;
     const bankAccounts = bankAccountsDocuments.map((account) => {
-      const bankAccount: BankAccount = {
+      const bankAccount : BankAccount  = {
         id: account["$id"],
         accountId: account["accountId"],
         name: account["name"],
@@ -168,9 +190,18 @@ export async function getBankAccountsByBankConnection(
         subtype: account["subtype"],
         balance: account["balance"],
         fundingSourceUrl: account["fundingSourceUrl"],
-        bankConnectionId: account["bankConnectionId"],
+        bankConnectionId: account["bankConnectionId"].$id,
       };
-      return bankAccount;
+
+      if (params.include?.bankConnection) {
+        const bankAccountWithBankConnection = {
+          ...bankAccount,
+          bankConnection: account["bankConnectionId"],
+        };
+        return bankAccountWithBankConnection as BankAccountWithInclude<T> ;
+      }
+
+      return bankAccount as BankAccountWithInclude<T>;
     });
 
     return bankAccounts;

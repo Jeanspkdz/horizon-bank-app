@@ -1,7 +1,7 @@
 import { z} from "zod"
 import { LinkTokenCreateResponse } from "plaid";
 
-const BankConnection = z.object({
+export const BankConnection = z.object({
   id: z.string(),
   userId: z.string(), 
   accessToken: z.string(), //Plaid
