@@ -1,5 +1,5 @@
 import { getLoggedInUser } from "@/modules/auth/actions/auth";
-import { getBankAccounts } from "@/modules/bankAccounts/actions";
+import { getBankAccountsByUser } from "@/modules/bankAccounts/actions";
 import { CreditCard } from "@/modules/core/components/credit-card";
 import { Heading } from "@/modules/core/components/heading";
 
@@ -11,7 +11,9 @@ async function MyBanksPage() {
   }
 
   const user = userResponse.data
-  const bankAccounts = await getBankAccounts(user.id);
+  const bankAccounts = await getBankAccountsByUser({
+    userId: user.id
+  });
   console.log(bankAccounts);
 
   return (

@@ -4,13 +4,12 @@ import { Heading } from "@/modules/core/components/heading";
 import { use, useEffect, useState } from "react";
 
 import {
-  BankAccount,
-  BankAccountWithInclude,
+  BankAccount
 } from "@/modules/bankAccounts/types";
-import { SummaryCard } from "@/modules/transactions/components/summary-card";
-import { BankCardSelect } from "./bank-card-select";
-import { getBankTransactionsByAccount } from "../actions";
 import { BankConnection } from "@/modules/bankConnection/types";
+import { SummaryCard } from "@/modules/transactions/components/summary-card";
+import { getBankTransactionsByAccount } from "../actions";
+import { BankCardSelect } from "./bank-card-select";
 
 interface TransactionPanelProps {
   bankAccountsPromise: Promise<
