@@ -210,3 +210,29 @@ export async function getBankAccountsByBankConnection<T extends BankAccountInclu
     throw new DefaultError("Error on fetching bank account");
   }
 }
+
+export async function getCursorByBankAccount(
+  accountId: string
+): Promise<string | null> {
+  const { database } = await createAdminClient();
+  const documentsResponse = await database.getDocument(
+    APPWRITE_DB!!,
+    APPWRITE_BANK_ACCOUNT_COLLECTION!!,
+    accountId
+  );
+  return documentsResponse["transactionCursor"];
+}
+
+export async function updateCursorByBankAccount(
+  accountId: string,
+  cursor: string
+): Promise<string | null> {
+  const { database } = await createAdminClient();
+  const documentsResponse = await database.updateDocument(
+    APPWRITE_DB!!,
+    APPWRITE_BANK_ACCOUNT_COLLECTION!!,
+    accountId,
+    {transactionCursor: cursor}
+  );
+  return documentsResponse["transactionCursor"];
+}

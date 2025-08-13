@@ -8,7 +8,7 @@ import {
 } from "@/modules/bankAccounts/types";
 import { BankConnection } from "@/modules/bankConnection/types";
 import { SummaryCard } from "@/modules/transactions/components/summary-card";
-import { getBankTransactionsByAccount } from "../actions";
+import { updateBankTransactionsByAccount } from "../actions";
 import { BankCardSelect } from "./bank-card-select";
 
 interface TransactionPanelProps {
@@ -28,18 +28,17 @@ export const TransactionPanel = ({
 
   const [isLoading, setIsLoading] = useState(false);
 
-  console.log(selectedBankAccount);
-
   useEffect(() => {
 
     const fetchTransactions = async () => {
       try {
         setIsLoading(true)
-        const transactions = await getBankTransactionsByAccount({
+        await updateBankTransactionsByAccount({
+          id: selectedBankAccount.id,
           accessToken: selectedBankAccount.bankConnection.accessToken,
-          accountId: selectedBankAccount.accountId,
-        });
-        console.log("Transactions:" ,transactions)
+          accountId: selectedBankAccount.accountId
+        })
+
       } catch (error) {
         console.log("[ERR_FETCHING_TRANSACTIOS]", error )
       } finally {

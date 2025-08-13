@@ -1,9 +1,8 @@
-import { User } from "@/modules/auth/types";
+import { getLoggedInUser } from "@/modules/auth/actions/auth";
+import { updateBankAccountBalanceByUser } from "@/modules/bankAccounts/actions";
 import { DoughnutChart } from "@/modules/core/components/doughnut-chart";
 import { Heading } from "@/modules/core/components/heading";
 import { RightSidebar } from "@/modules/core/components/right-sidebar";
-import { getLoggedInUser} from "@/modules/auth/actions/auth";
-import { updateBankAccountBalanceByUser } from "@/modules/bankAccounts/actions";
 
 export const HomePanel = async () => {
    const response = await getLoggedInUser()

@@ -14,7 +14,6 @@ async function MyBanksPage() {
   const bankAccounts = await getBankAccountsByUser({
     userId: user.id
   });
-  console.log(bankAccounts);
 
   return (
     <div className="p-5">
