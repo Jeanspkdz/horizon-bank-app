@@ -10,8 +10,9 @@ import { BankConnection } from "@/modules/bankConnection/types";
 import { SummaryCard } from "@/modules/transactions/components/summary-card";
 import { getBankTransactionsByAccount, updateBankTransactionsByAccount } from "../actions";
 import { BankCardSelect } from "../../core/components/bank-card-select";
-import { TransactionsTable } from "./transactions-table";
+import { TransactionsTable } from "./transaction-table/transactions-table";
 import { Transaction } from "../types";
+import { TransactionTableSkeleton } from "./transaction-table/transaction-table-skeleton";
 
 interface TransactionPanelProps {
   bankAccountsPromise: Promise<
@@ -86,7 +87,7 @@ export const TransactionPanel = ({
           <h2 className="font-semibold my-5">Transaction History</h2>
 
           {isLoading ? (
-            <p>Loading....</p>
+            <TransactionTableSkeleton/>
           ) : (
            <TransactionsTable
             data={transactions}
