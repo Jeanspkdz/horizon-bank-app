@@ -37,6 +37,7 @@ export const TransactionPanel = ({
     const fetchTransactions = async () => {
       try {
         setIsLoading(true)
+        //TODO
         // await updateBankTransactionsByAccount({
         //   id: selectedBankAccount.id,
         //   accessToken: selectedBankAccount.bankConnection.accessToken,
