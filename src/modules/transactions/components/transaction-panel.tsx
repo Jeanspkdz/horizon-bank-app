@@ -8,8 +8,10 @@ import {
 } from "@/modules/bankAccounts/types";
 import { BankConnection } from "@/modules/bankConnection/types";
 import { SummaryCard } from "@/modules/transactions/components/summary-card";
-import { updateBankTransactionsByAccount } from "../actions";
+import { getBankTransactionsByAccount, updateBankTransactionsByAccount } from "../actions";
 import { BankCardSelect } from "./bank-card-select";
+import { TransactionsTable } from "./transactions-table";
+import { Transaction } from "../types";
 
 interface TransactionPanelProps {
   bankAccountsPromise: Promise<
@@ -26,6 +28,8 @@ export const TransactionPanel = ({
     (bankAccount) => bankAccount.accountId === bankAccountId
   )!!!!;
 
+  const [transactions, setTransactions] = useState<Transaction[]>([])
+
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -33,11 +37,13 @@ export const TransactionPanel = ({
     const fetchTransactions = async () => {
       try {
         setIsLoading(true)
-        await updateBankTransactionsByAccount({
-          id: selectedBankAccount.id,
-          accessToken: selectedBankAccount.bankConnection.accessToken,
-          accountId: selectedBankAccount.accountId
-        })
+        // await updateBankTransactionsByAccount({
+        //   id: selectedBankAccount.id,
+        //   accessToken: selectedBankAccount.bankConnection.accessToken,
+        //   accountId: selectedBankAccount.accountId
+        // })
+        const transactions = await getBankTransactionsByAccount(selectedBankAccount.id)
+        setTransactions(transactions)
 
       } catch (error) {
         console.log("[ERR_FETCHING_TRANSACTIOS]", error )
@@ -76,14 +82,14 @@ export const TransactionPanel = ({
         />
 
         <div>
-          <h2 className="font-semibold mt-5">Transaction History</h2>
+          <h2 className="font-semibold my-5">Transaction History</h2>
 
           {isLoading ? (
             <p>Loading....</p>
           ) : (
-            <div>
-              Transactions
-            </div>
+           <TransactionsTable
+            data={transactions}
+           />
           )}
         </div>
       </div>

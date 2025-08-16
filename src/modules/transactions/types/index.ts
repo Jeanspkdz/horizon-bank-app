@@ -3,9 +3,10 @@ import {z} from "zod"
 const Transaction = z.object({
   id: z.string(),
   amount: z.number(),
-  status: z.string(),
+  status: z.enum(["success", "pending"]),
   category: z.string(),
-  merchantLogoUrl: z.string(),
+  merchantName: z.string(),
+  merchantLogoUrl: z.string().nullable(),
   datetime: z.string().datetime(),
   externalTransactionId: z.string(),
   bankAccountId: z.string()

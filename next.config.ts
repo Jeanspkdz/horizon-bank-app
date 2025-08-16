@@ -3,6 +3,12 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
+  images: {
+    remotePatterns: [
+      //@ts-ignore
+      new URL("https://plaid-merchant-logos.plaid.com/**") 
+    ]
+  }
 };
 
 export default withSentryConfig(withSentryConfig(nextConfig, {

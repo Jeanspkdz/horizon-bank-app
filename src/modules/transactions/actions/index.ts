@@ -1,11 +1,15 @@
 "use server";
 
-import { getCursorByBankAccount, updateCursorByBankAccount } from "@/modules/bankAccounts/actions";
+import {
+  getCursorByBankAccount,
+  updateCursorByBankAccount,
+} from "@/modules/bankAccounts/actions";
 import { plaidClient } from "@/modules/bankConnection/lib/plaid";
 import { createAdminClient } from "@/modules/core/lib/appwrite";
 import { ID, Query } from "node-appwrite";
 import { TransactionsSyncRequest } from "plaid";
 import {
+  Transaction,
   TransactionCreateInput,
   TransactionId,
   TransactionUpdateInput,
@@ -44,7 +48,8 @@ export async function updateBankTransactionsByAccount({
           amount: transaction.amount,
           status: transaction.pending ? "pending" : "success",
           category: transaction.personal_finance_category?.primary || "other",
-          merchantLogoUrl: transaction.logo_url || "",
+          merchantName: transaction.merchant_name ?? "other",
+          merchantLogoUrl: transaction.logo_url ?? "",
           datetime: transaction.date,
           bankAccountId: id,
           externalTransactionId: transaction.transaction_id,
@@ -93,8 +98,8 @@ export async function updateBankTransactionsByAccount({
   }
 
   //Store cursor in bank account
-  if(cursor !== null){
-    await updateCursorByBankAccount(id, cursor)
+  if (cursor !== null) {
+    await updateCursorByBankAccount(id, cursor);
   }
 }
 
@@ -103,7 +108,7 @@ interface GetBankTransactionsRequest {
   accountId: string;
   cursor: string | null;
 }
-export async function getBankTransactionsByAccountFromPlaid({
+async function getBankTransactionsByAccountFromPlaid({
   accessToken,
   accountId,
   cursor,
@@ -132,7 +137,7 @@ async function createBankTransactions(transactions: TransactionCreateInput[]) {
         APPWRITE_DB!!,
         APPWRITE_TRANSACTION_COLLECTION!!,
         ID.unique(),
-        {...transaction}
+        { ...transaction }
       );
     })
   );
@@ -193,4 +198,30 @@ async function deleteBankTransactions(deletedTransactionIds: TransactionId[]) {
   );
 
   console.log("Finishing Deleting transactions!!!!");
+}
+
+export async function getBankTransactionsByAccount(bankAccountId: string) {
+  const { database } = await createAdminClient();
+
+  const { documents } = await database.listDocuments(
+    APPWRITE_DB!!,
+    APPWRITE_TRANSACTION_COLLECTION!!,
+    [Query.equal("bankAccountId", bankAccountId)]
+  );
+
+  const transactions: Transaction[] = documents.map(
+    (doc): Transaction => ({
+      id: doc["$id"],
+      amount: doc["amount"],
+      status: doc["status"],
+      category: doc["category"],
+      merchantName: doc["merchantName"],
+      merchantLogoUrl: doc["merchantLogoUrl"],
+      datetime: doc["datetime"],
+      bankAccountId: doc["bankAccountId"],
+      externalTransactionId: doc["externalTransactionId"],
+    })
+  );
+
+  return transactions
 }
