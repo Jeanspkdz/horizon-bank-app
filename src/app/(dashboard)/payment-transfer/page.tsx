@@ -22,9 +22,7 @@ async function PaymentTransferPage() {
         subtitle="Please provide any specific details or notes related to the payment transfer"
       />
 
-      <Suspense fallback={<span>Loading....</span>}>
-        <TransferPanel bankAccountsPromise={bankAccountsPromise} />
-      </Suspense>
+      <TransferPanel bankAccountsPromise={bankAccountsPromise} />
     </div>
   );
 }

@@ -9,7 +9,7 @@ import {
 import { BankConnection } from "@/modules/bankConnection/types";
 import { SummaryCard } from "@/modules/transactions/components/summary-card";
 import { getBankTransactionsByAccount, updateBankTransactionsByAccount } from "../actions";
-import { BankCardSelect } from "./bank-card-select";
+import { BankCardSelect } from "../../core/components/bank-card-select";
 import { TransactionsTable } from "./transactions-table";
 import { Transaction } from "../types";
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { BankAccount } from "@/modules/bankAccounts/types";
+import { AsyncBankCardSelect } from "@/modules/core/components/async-bank-card-select";
 import { Button } from "@/modules/core/components/ui/button";
 import {
   Form,
@@ -10,25 +11,23 @@ import {
   FormMessage,
 } from "@/modules/core/components/ui/form";
 import { Input } from "@/modules/core/components/ui/input";
+import { Skeleton } from "@/modules/core/components/ui/skeleton";
 import { Textarea } from "@/modules/core/components/ui/textarea";
-import { BankCardSelect } from "@/modules/transactions/components/bank-card-select";
 import { TransferFormSchema } from "@/modules/transfers/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { use } from "react";
-import { Controller, SubmitHandler, useForm } from "react-hook-form";
+import { Suspense } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
 
 interface TransferPanelProps {
   bankAccountsPromise: Promise<BankAccount[]>;
 }
 
 export const TransferPanel = ({ bankAccountsPromise }: TransferPanelProps) => {
-  const bankAccounts = use(bankAccountsPromise);
-
   const form = useForm<TransferFormSchema>({
     resolver: zodResolver(TransferFormSchema),
     defaultValues: {
       amount: 0,
-      bankAccountId: bankAccounts[0].accountId,
+      bankAccountId: "",
       note: "",
       recipientEmail: "",
       sharableId: "",
@@ -58,15 +57,22 @@ export const TransferPanel = ({ bankAccountsPromise }: TransferPanelProps) => {
               </div>
 
               <div className="flex-8/12">
-                <Controller
+                <FormField
                   control={form.control}
                   name="bankAccountId"
                   render={({ field }) => (
-                    <BankCardSelect
-                      bankAccounts={bankAccounts}
-                      onValueChange={field.onChange}
-                      value={field.value}
-                    />
+                    <FormItem>
+                      <FormControl>
+                        <Suspense fallback={<Skeleton className="w-[190px] h-10"/>}>
+                          <AsyncBankCardSelect
+                            bankAccontsPromise={bankAccountsPromise}
+                            onValueChange={field.onChange}
+                            value={field.value}
+                          />
+                        </Suspense>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
                   )}
                 />
               </div>

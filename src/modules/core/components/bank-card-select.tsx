@@ -24,7 +24,7 @@ interface BankCardSelectProps {
 export const BankCardSelect = ({bankAccounts, value, onValueChange}: BankCardSelectProps) => {
   return (
     <Select value={value} onValueChange={onValueChange}>
-      <SelectTrigger className="w-[190px]">
+      <SelectTrigger className="min-w-[190px]">
         <CreditCard className="h-4 w-4 text-blue-500" />
         <SelectValue placeholder="Choose a bank" className="font-bold" />
       </SelectTrigger>
