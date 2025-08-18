@@ -1,9 +1,6 @@
 import { getLoggedInUser } from "@/modules/auth/actions/auth";
-import { getBankAccountsByUser } from "@/modules/bankAccounts/actions";
 import { UserBankAccountsList } from "@/modules/bankAccounts/components/bank-account-list";
 import { UserBankAccountListSkeleton } from "@/modules/bankAccounts/components/bank-account-list-skeleton";
-import { CreditCard } from "@/modules/core/components/credit-card";
-import { CreditCardSkeleton } from "@/modules/core/components/credit-card--skeleton";
 import { Heading } from "@/modules/core/components/heading";
 import { Suspense } from "react";
 

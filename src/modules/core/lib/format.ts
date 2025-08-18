@@ -17,9 +17,6 @@ export function formatDate(date: string, locale: string = "en-US"){
     year: "numeric",
     month: "long",
     day: "2-digit",
-    hour: "2-digit",
-    hour12: true,
-    minute: "2-digit"
   })
 
   return formatter.format(new Date(date))

@@ -2,8 +2,6 @@ import { Skeleton } from "@/modules/core/components/ui/skeleton";
 import { RightSidebarSkeleton } from "@/modules/core/components/right-sidebar-skeleton";
 
 export function HomePanelSkeleton() {
-  console.log("HOME PANEL SKELETON");
-
   return (
     <div className="flex w-full h-full">
       {/* Left Section */}

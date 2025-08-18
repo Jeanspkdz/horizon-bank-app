@@ -3,16 +3,16 @@
 import { Heading } from "@/modules/core/components/heading";
 import { use, useEffect, useState } from "react";
 
-import {
-  BankAccount
-} from "@/modules/bankAccounts/types";
+import { BankAccount } from "@/modules/bankAccounts/types";
 import { BankConnection } from "@/modules/bankConnection/types";
 import { SummaryCard } from "@/modules/transactions/components/summary-card";
-import { getBankTransactionsByAccount, updateBankTransactionsByAccount } from "../actions";
 import { BankCardSelect } from "../../core/components/bank-card-select";
-import { TransactionsTable } from "./transaction-table/transactions-table";
+import {
+  getBankTransactionsByAccount
+} from "../actions";
 import { Transaction } from "../types";
 import { TransactionTableSkeleton } from "./transaction-table/transaction-table-skeleton";
+import { TransactionsTable } from "./transaction-table/transactions-table";
 
 interface TransactionPanelProps {
   bankAccountsPromise: Promise<
@@ -25,37 +25,42 @@ export const TransactionPanel = ({
 }: TransactionPanelProps) => {
   const bankAccounts = use(bankAccountsPromise);
   const [bankAccountId, setBankAccountId] = useState(bankAccounts[0].accountId);
+
   const selectedBankAccount = bankAccounts.find(
     (bankAccount) => bankAccount.accountId === bankAccountId
-  )!!!!;
+  );
 
-  const [transactions, setTransactions] = useState<Transaction[]>([])
-
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
+    if (selectedBankAccount == null) return;
+
+    let isCancelled = false;
 
     const fetchTransactions = async () => {
       try {
-        setIsLoading(true)
-        //TODO
-        // await updateBankTransactionsByAccount({
-        //   id: selectedBankAccount.id,
-        //   accessToken: selectedBankAccount.bankConnection.accessToken,
-        //   accountId: selectedBankAccount.accountId
-        // })
-        const transactions = await getBankTransactionsByAccount(selectedBankAccount.id)
-        setTransactions(transactions)
+        setIsLoading(true);
+        if (isCancelled) return;
+        const transactions = await getBankTransactionsByAccount(
+          selectedBankAccount.id
+        );
 
+        if (!isCancelled) {
+          setTransactions(transactions);
+        }
       } catch (error) {
-        console.log("[ERR_FETCHING_TRANSACTIOS]", error )
+        console.log("[ERR_FETCHING_TRANSACTIONS]", error);
       } finally {
         setIsLoading(false);
       }
     };
     fetchTransactions();
 
-  }, [bankAccountId, selectedBankAccount]);
+    return () => {
+      isCancelled = false;
+    };
+  }, [bankAccountId]);
 
   return (
     <div className="p-5">
@@ -77,9 +82,9 @@ export const TransactionPanel = ({
 
       <div>
         <SummaryCard
-          title={selectedBankAccount.name}
-          name={selectedBankAccount.officialName ?? "Bank Account"}
-          balance={selectedBankAccount.balance ?? 0}
+          title={selectedBankAccount?.name ?? "Unknown"} 
+          name={selectedBankAccount?.officialName ?? "Bank Account"}
+          balance={selectedBankAccount?.balance ?? 0}
           className="mt-5"
         />
 
@@ -87,11 +92,9 @@ export const TransactionPanel = ({
           <h2 className="font-semibold my-5">Transaction History</h2>
 
           {isLoading ? (
-            <TransactionTableSkeleton/>
+            <TransactionTableSkeleton />
           ) : (
-           <TransactionsTable
-            data={transactions}
-           />
+            <TransactionsTable data={transactions} />
           )}
         </div>
       </div>

@@ -1,5 +1,5 @@
 import { getLoggedInUser } from "@/modules/auth/actions/auth";
-import { updateBankAccountBalanceByUser } from "@/modules/bankAccounts/actions";
+import { updateBankAccountsBalanceByUser } from "@/modules/bankAccounts/actions";
 import { DoughnutChart } from "@/modules/core/components/doughnut-chart";
 import { Heading } from "@/modules/core/components/heading";
 import { RightSidebar } from "@/modules/core/components/right-sidebar";
@@ -11,8 +11,6 @@ export const HomePanel = async () => {
       throw response.error
   }
   const user = response.data
-
-  await updateBankAccountBalanceByUser(user.id)
 
     return (
       <div className="flex w-full h-full">

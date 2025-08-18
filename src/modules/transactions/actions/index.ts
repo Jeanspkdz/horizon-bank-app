@@ -1,20 +1,21 @@
 "use server";
 
 import {
+  getBankAccountsByUser,
   getCursorByBankAccount,
   updateCursorByBankAccount,
 } from "@/modules/bankAccounts/actions";
 import { plaidClient } from "@/modules/bankConnection/lib/plaid";
 import { createAdminClient } from "@/modules/core/lib/appwrite";
-import { ID, Query } from "node-appwrite";
-import { TransactionsSyncRequest } from "plaid";
+import { isPlaidError } from "@/modules/core/lib/plaid";
 import {
   Transaction,
   TransactionCreateInput,
   TransactionId,
   TransactionUpdateInput,
 } from "@/modules/transactions/types";
-import { isPlaidError } from "@/modules/core/lib/plaid";
+import { ID, Query } from "node-appwrite";
+import { TransactionsSyncRequest } from "plaid";
 
 const { APPWRITE_DB, APPWRITE_TRANSACTION_COLLECTION } = process.env;
 
@@ -28,6 +29,7 @@ export async function updateBankTransactionsByAccount({
   id,
   accountId,
 }: UpdateBankTransactionsByAccountRequest) {
+
   //Get the cursor from the last sync
   let cursor = await getCursorByBankAccount(id);
   let tempCursor = cursor;
@@ -48,8 +50,14 @@ export async function updateBankTransactionsByAccount({
           amount: transaction.amount,
           status: transaction.pending ? "pending" : "success",
           category: transaction.personal_finance_category?.primary || "other",
-          merchantName: transaction.merchant_name ?? "other",
-          merchantLogoUrl: transaction.logo_url ?? "",
+          merchantName:
+            transaction.merchant_name ??
+            cleanTransactionName(transaction.name) ??
+            "other",
+          merchantLogoUrl:
+            transaction.logo_url ??
+            transaction.personal_finance_category_icon_url ??
+            null,
           datetime: transaction.date,
           bankAccountId: id,
           externalTransactionId: transaction.transaction_id,
@@ -62,7 +70,7 @@ export async function updateBankTransactionsByAccount({
           amount: transaction.amount,
           status: transaction.pending ? "pending" : "success",
           category: transaction.personal_finance_category?.primary || "other",
-          merchantLogoUrl: transaction.logo_url || "",
+          merchantLogoUrl: transaction.logo_url || null,
           datetime: transaction.date,
         };
       });
@@ -101,6 +109,26 @@ export async function updateBankTransactionsByAccount({
   if (cursor !== null) {
     await updateCursorByBankAccount(id, cursor);
   }
+}
+
+export async function updateBankTransactionsByUser(userId: string) {
+  // Get bankAccoutns from user
+  const bankAccounts = await getBankAccountsByUser({
+    userId,
+    include: {
+      bankConnection: true
+    }
+  });
+  // For each bankAccount update its transactions
+  Promise.all(
+    bankAccounts.map(async (bankAccount) => {
+      return await updateBankTransactionsByAccount({
+        id: bankAccount.id,
+        accountId: bankAccount.accountId,
+        accessToken: bankAccount.bankConnection.accessToken,
+      });
+    })
+  ); 
 }
 
 interface GetBankTransactionsRequest {
@@ -223,5 +251,5 @@ export async function getBankTransactionsByAccount(bankAccountId: string) {
     })
   );
 
-  return transactions
+  return transactions;
 }

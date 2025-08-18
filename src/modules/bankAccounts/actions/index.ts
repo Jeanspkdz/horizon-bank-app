@@ -32,7 +32,6 @@ export async function getBankAccountsByUser<T extends BankAccountIncludeOptions>
       )
     );
 
-
     return financialUserBankAccounts.flat(1);
   } catch (error) {
     console.log("[ERR_GET_BANK_ACCOUNTS]", error);
@@ -40,7 +39,7 @@ export async function getBankAccountsByUser<T extends BankAccountIncludeOptions>
   }
 }
 
-export async function updateBankAccountBalanceByUser(userId: string) {
+export async function updateBankAccountsBalanceByUser(userId: string) {
   try {
     //Get BankConnectionByUser
     const bankConnections = await getBankConnectionsByUserId(userId);

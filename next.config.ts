@@ -6,7 +6,8 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       //@ts-ignore
-      new URL("https://plaid-merchant-logos.plaid.com/**") 
+      new URL("https://plaid-merchant-logos.plaid.com/**"),
+      new URL("https://plaid-category-icons.plaid.com/**"),
     ]
   }
 };

@@ -1,4 +1,5 @@
 import { getLoggedInUser } from "@/modules/auth/actions/auth";
+import { syncUserBankData } from "@/modules/core/actions";
 import { Navbar } from "@/modules/core/components/navbar";
 import { Sidebar } from "@/modules/core/components/sidebar";
 import { SidebarProvider } from "@/modules/core/components/ui/sidebar";
@@ -15,6 +16,9 @@ const DashboardLayout = async ({
   }
   
   const user = response.data
+  console.log("NANI??");
+  
+  syncUserBankData(user.id)
 
   return (
     <SidebarProvider className="block">
