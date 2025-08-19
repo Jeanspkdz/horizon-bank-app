@@ -1,5 +1,6 @@
 import { Skeleton } from "@/modules/core/components/ui/skeleton";
 import { RightSidebarSkeleton } from "@/modules/core/components/right-sidebar-skeleton";
+import { Heading } from "@/modules/core/components/heading";
 
 export function HomePanelSkeleton() {
   return (
@@ -7,8 +8,12 @@ export function HomePanelSkeleton() {
       {/* Left Section */}
       <div className="flex-1 space-y-6 mr-5 px-5 pt-5">
         <div>
-          <Skeleton className="h-8 w-48" /> {/* Welcome */}
-          <Skeleton className="h-6 w-72 mt-4" /> {/* Subtext */}
+          <Heading
+            type="greeting"
+            title="Welcome"
+            subtitle="Access and manage your account and transactions efficiently"
+            name={``}
+          />
         </div>
 
         <div className="p-4 rounded-xl shadow w-full flex">

@@ -1,5 +1,6 @@
 import { Plus } from "lucide-react";
 import { Skeleton } from "@/modules/core/components/ui/skeleton";
+import { Button } from "@/modules/core/components/ui/button";
 
 export const RightSidebarSkeleton = () => {
   return (
@@ -20,11 +21,12 @@ export const RightSidebarSkeleton = () => {
         {/* My Banks section */}
         <div className="mt-16">
           <div className="flex justify-between items-center">
-            <Skeleton className="h-6 w-20" /> {/* My Banks title */}
-            <div className="flex items-center gap-2 text-slate-600">
-              <Plus className="w-4 h-4" />
-              <Skeleton className="h-4 w-16" /> {/* Add Bank text */}
-            </div>
+            <h2 className="font-semibold text-xl">My Banks</h2>
+
+            <Button variant={"ghost"} className="cursor-pointer text-slate-600" disabled>
+              <Plus />
+              Add Bank
+            </Button>
           </div>
 
           {/* Credit Cards */}

@@ -7,13 +7,19 @@ import { Button } from "@/modules/core/components/ui/button";
 import { Plus } from "lucide-react";
 import { CreditCard } from "./credit-card";
 import { getUserInitials } from "@/modules/auth/lib/util";
+import { BankAccount } from "@/modules/bankAccounts/types";
 
 interface RightSidebarProps {
   username: string;
   email: string;
+  bankAccounts: BankAccount[];
 }
 
-export const RightSidebar = ({ username, email }: RightSidebarProps) => {
+export const RightSidebar = ({
+  username,
+  email,
+  bankAccounts,
+}: RightSidebarProps) => {
   return (
     <aside className="lg:flex lg:flex-col lg:w-[355px] lg:h-full border-l border-l-slate-400/30">
       <div className="h-32 bg-[url(/images/gradient-mesh.svg)] bg-cover" />
@@ -41,11 +47,23 @@ export const RightSidebar = ({ username, email }: RightSidebarProps) => {
 
           <div className="mt-6 relative h-full">
             <div className="z-20 w-11/12 relative">
-              <CreditCard username={username} className="w-full" />
+              <CreditCard
+                username={username}
+                balance={bankAccounts[0].balance}
+                currency={"USD"}
+                name={bankAccounts[0].name}
+                className="w-full"
+              />
             </div>
 
             <div className="z-10 absolute top-[15%] left-[10%] w-11/12">
-              <CreditCard username={username} className="w-full"/>
+              <CreditCard
+                username={username}
+                balance={bankAccounts[1].balance}
+                currency={"USD"}
+                name={bankAccounts[1].name}
+                className="w-full"
+              />
             </div>
           </div>
         </div>

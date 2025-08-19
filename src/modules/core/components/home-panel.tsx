@@ -1,5 +1,5 @@
 import { getLoggedInUser } from "@/modules/auth/actions/auth";
-import { updateBankAccountsBalanceByUser } from "@/modules/bankAccounts/actions";
+import { getBankAccountsByUser } from "@/modules/bankAccounts/actions";
 import { DoughnutChart } from "@/modules/core/components/doughnut-chart";
 import { Heading } from "@/modules/core/components/heading";
 import { RightSidebar } from "@/modules/core/components/right-sidebar";
@@ -11,6 +11,10 @@ export const HomePanel = async () => {
       throw response.error
   }
   const user = response.data
+
+  const bankAccounts = await getBankAccountsByUser({
+    userId: user.id
+  })
 
     return (
       <div className="flex w-full h-full">
@@ -25,13 +29,18 @@ export const HomePanel = async () => {
           </div>
 
           <div>
-            <DoughnutChart />
+            <DoughnutChart
+              data={bankAccounts}
+              dataKey={"balance"}
+              nameKey={"name"}
+            />
           </div>
 
         </div>
 
         <div className="hidden lg:block">
           <RightSidebar 
+            bankAccounts={bankAccounts}
             email={user!.email}
             username={`${user?.firstName} ${user?.lastName}`}
           />

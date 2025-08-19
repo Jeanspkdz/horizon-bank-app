@@ -7,8 +7,11 @@ export const TransactionPanelSkeleton = () => {
     <div className="p-5">
       <div className="flex justify-between items-center">
         <div>
-          <Skeleton className="h-8 w-48" /> {/* Welcome */}
-          <Skeleton className="h-6 w-72 mt-4" /> {/* Subtext */}
+          <Heading
+            type="default"
+            title="Transaction History"
+            subtitle="Gain Insights and Track Your Transactions Over Time"
+          />
         </div>
 
         <Skeleton className="h-10 w-[190px]" />
