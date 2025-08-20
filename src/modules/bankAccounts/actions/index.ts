@@ -60,7 +60,7 @@ export async function updateBankAccountsBalanceByUser(userId: string) {
       await Promise.all(
         accounts.map((account) => {
           const bankAccountMatched = bankAccounts.find(
-            (bankAccount) => bankAccount.accountId == account.account_id
+            (bankAccount) => bankAccount.externalAccountId == account.account_id
           );
 
           if (bankAccountMatched == null) return Promise.resolve();
@@ -96,14 +96,14 @@ async function updateBankAccount({ id, data }: UpdateBankAccountRequest) {
     );
 
     const bankAccountUpdated: BankAccount = {
-      id: documentCreated.$id, // Usamos el id generado por Appwrite
-      accountId: documentCreated.accountId,
+      id: documentCreated.$id,
+      externalAccountId: documentCreated.externalAccountId,
       fundingSourceUrl: documentCreated.fundingSourceUrl,
       name: documentCreated.name,
       officialName: documentCreated.officialName,
       type: documentCreated.type,
       subtype: documentCreated.subtype,
-      balance: documentCreated.balance, // TODO : Update in DB
+      balance: documentCreated.balance,
       bankConnectionId: documentCreated.bankConnectionId,
     };
 
@@ -128,13 +128,13 @@ export async function createBankAccount(
 
     const bankAccountCreated: BankAccount = {
       id: documentCreated.$id, // Usamos el id generado por Appwrite
-      accountId: documentCreated.accountId,
+      externalAccountId: documentCreated.externalAccountId,
       fundingSourceUrl: documentCreated.fundingSourceUrl,
       name: documentCreated.name,
       officialName: documentCreated.officialName,
       type: documentCreated.type,
       subtype: documentCreated.subtype,
-      balance: documentCreated.balance, // TODO : Update in DB
+      balance: documentCreated.balance,
       bankConnectionId: documentCreated.bankConnectionId,
     };
 
@@ -182,7 +182,7 @@ export async function getBankAccountsByBankConnection<T extends BankAccountInclu
     const bankAccounts = bankAccountsDocuments.map((account) => {
       const bankAccount : BankAccount  = {
         id: account["$id"],
-        accountId: account["accountId"],
+        externalAccountId: account["externalAccountId"],
         name: account["name"],
         officialName: account["officialName"],
         type: account["type"],

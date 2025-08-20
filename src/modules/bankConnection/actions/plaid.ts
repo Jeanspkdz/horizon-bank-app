@@ -151,7 +151,7 @@ export async function setUpBankAccountIntegration({
         type: account.type,
         subtype: account.subtype ?? "unknown",
         fundingSourceUrl,
-        accountId: account.account_id,
+        externalAccountId: account.account_id,
         balance: account.balances.available ?? account.balances.current ?? 0,
         bankConnectionId: bankConnectionCreated.id,
       });

@@ -1,3 +1,4 @@
+import { BankAccount } from "@/modules/bankAccounts/types";
 import {
   Select,
   SelectContent,
@@ -14,11 +15,7 @@ import { CreditCard } from "lucide-react";
 interface BankCardSelectProps {
   value: string;
   onValueChange: (value: string) => void;
-  bankAccounts: {
-    accountId: string;
-    name: string;
-    balance: number 
-  }[];
+  bankAccounts: BankAccount[];
 }
 
 export const BankCardSelect = ({bankAccounts, value, onValueChange}: BankCardSelectProps) => {
@@ -33,8 +30,8 @@ export const BankCardSelect = ({bankAccounts, value, onValueChange}: BankCardSel
           <SelectLabel>Select a Bank to Display</SelectLabel>
           {bankAccounts.map((bankAccount) => (
             <SelectItem
-              value={bankAccount.accountId}
-              key={bankAccount.accountId}
+              value={bankAccount.externalAccountId}
+              key={bankAccount.id}
               className="px-6"
             >
               <div className="font-semibold">

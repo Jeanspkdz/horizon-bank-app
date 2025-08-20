@@ -4,7 +4,7 @@ import { z } from "zod";
 
 const BankAccount = z.object({
   id: z.string(),
-  accountId: z.string(),
+  externalAccountId: z.string(),
   fundingSourceUrl: z.string(),
   name: z.string(),
   officialName: z.string(),

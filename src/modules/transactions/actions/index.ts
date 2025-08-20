@@ -21,13 +21,13 @@ const { APPWRITE_DB, APPWRITE_TRANSACTION_COLLECTION } = process.env;
 
 interface UpdateBankTransactionsByAccountRequest {
   accessToken: string;
-  accountId: string;
+  externalAccountId: string;
   id: string;
 }
 export async function updateBankTransactionsByAccount({
   accessToken,
   id,
-  accountId,
+  externalAccountId,
 }: UpdateBankTransactionsByAccountRequest) {
 
   //Get the cursor from the last sync
@@ -39,7 +39,7 @@ export async function updateBankTransactionsByAccount({
     try {
       const data = await getBankTransactionsByAccountFromPlaid({
         accessToken,
-        accountId,
+        accountId: externalAccountId,
         cursor,
       });
 
@@ -124,7 +124,7 @@ export async function updateBankTransactionsByUser(userId: string) {
     bankAccounts.map(async (bankAccount) => {
       return await updateBankTransactionsByAccount({
         id: bankAccount.id,
-        accountId: bankAccount.accountId,
+        externalAccountId: bankAccount.externalAccountId,
         accessToken: bankAccount.bankConnection.accessToken,
       });
     })
