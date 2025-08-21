@@ -5,7 +5,7 @@ export const CreditCardSkeleton = ({ className }: { className?: string }) => {
   return (
     <article
       className={cn(
-        "flex aspect-[32/19] min-h-[190px] max-w-[280px] md:max-w-[320px] lg:max-w-[360px] rounded-xl overflow-hidden relative z-[5]",
+        "flex aspect-[32/19] min-h-[190px] w-full max-w-[320px] rounded-xl overflow-hidden relative z-[5]",
         className
       )}
     >

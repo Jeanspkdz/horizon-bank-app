@@ -12,9 +12,10 @@ const BankAccount = z.object({
   subtype: z.string(),
   balance: z.number(),
   bankConnectionId: z.string(),
+  shareableId: z.string()
 });
 const BankAccountCreateInput = BankAccount.omit({ id: true });
-const BankAccountUpdateInput = BankAccount.omit({ id: true }).partial();
+const BankAccountUpdateInput = BankAccount.omit({ id: true, shareableId: true }).partial();
 const BankAccountWithBankConnection = BankAccount.extend({
   bankConnection: BankConnection,
 });

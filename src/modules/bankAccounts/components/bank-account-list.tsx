@@ -1,15 +1,13 @@
-import React from "react";
-import { BankAccount } from "@/modules/bankAccounts/types";
-import { getBankAccountsByUser } from "../actions";
 import { CreditCard } from "@/modules/core/components/credit-card";
+import { getBankAccountsByUser } from "../actions";
 
 interface UserBankAcccountListProps {
   userId: string;
-  username: string
+  username: string;
 }
 export const UserBankAccountsList = async ({
   userId,
-  username
+  username,
 }: UserBankAcccountListProps) => {
   const bankAccounts = await getBankAccountsByUser({
     userId,
@@ -26,6 +24,7 @@ export const UserBankAccountsList = async ({
               name={account.name}
               balance={account.balance ?? "No balance available"}
               currency={"USD"}
+              shareableId={account.shareableId}
             />
           ))}
         </div>

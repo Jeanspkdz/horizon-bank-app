@@ -105,6 +105,7 @@ async function updateBankAccount({ id, data }: UpdateBankAccountRequest) {
       subtype: documentCreated.subtype,
       balance: documentCreated.balance,
       bankConnectionId: documentCreated.bankConnectionId,
+      shareableId: documentCreated.shareableId
     };
 
     return bankAccountUpdated;
@@ -136,6 +137,7 @@ export async function createBankAccount(
       subtype: documentCreated.subtype,
       balance: documentCreated.balance,
       bankConnectionId: documentCreated.bankConnectionId,
+      shareableId: crypto.randomUUID()
     };
 
     return bankAccountCreated;
@@ -190,6 +192,7 @@ export async function getBankAccountsByBankConnection<T extends BankAccountInclu
         balance: account["balance"],
         fundingSourceUrl: account["fundingSourceUrl"],
         bankConnectionId: account["bankConnectionId"].$id,
+        shareableId: account["shareableId"]
       };
 
       if (params.include?.bankConnection) {
