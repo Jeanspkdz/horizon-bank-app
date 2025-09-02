@@ -2,7 +2,6 @@ import { getLoggedInUser } from "@/modules/auth/actions/auth";
 import { getBankAccountsByUser } from "@/modules/bankAccounts/actions";
 import { Heading } from "@/modules/core/components/heading";
 import { TransferPanel } from "@/modules/transfers/components/transfer-panel";
-import { Suspense } from "react";
 
 async function PaymentTransferPage() {
   const response = await getLoggedInUser();

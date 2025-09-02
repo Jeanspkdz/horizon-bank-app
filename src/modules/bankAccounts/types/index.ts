@@ -1,8 +1,8 @@
-import { User } from "@/modules/auth/types";
 import { BankConnection } from "@/modules/bankConnection/types";
+import { Expand, ModelQueryFilters } from "@/modules/core/types";
 import { z } from "zod";
 
-const BankAccount = z.object({
+export const BankAccount = z.object({
   id: z.string(),
   externalAccountId: z.string(),
   fundingSourceUrl: z.string(),
@@ -12,35 +12,39 @@ const BankAccount = z.object({
   subtype: z.string(),
   balance: z.number(),
   bankConnectionId: z.string(),
-  shareableId: z.string()
+  shareableId: z.string(),
 });
-const BankAccountCreateInput = BankAccount.omit({ id: true });
-const BankAccountUpdateInput = BankAccount.omit({ id: true, shareableId: true }).partial();
-const BankAccountWithBankConnection = BankAccount.extend({
+
+const BankAccountCreateInput = BankAccount.omit({
+  id: true,
+  shareableId: true,
+});
+const BankAccountUpdateInput = BankAccount.omit({
+  id: true,
+  shareableId: true,
+}).partial();
+
+const BankAccountWithBankConnection = z.object({
+  ...BankAccount.shape,
   bankConnection: BankConnection,
 });
 
-export interface BankAccountIncludeOptions {
-  bankConnection?: boolean;
+export type GetBankAccountsArgs = {
+  queryFilters: ModelQueryFilters<BankAccount>[];
+  includeOptions?: BankAccountIncludeOptions;
+};
+
+export type BankAccountIncludeOptions = {
+  bankConnection: boolean ;
 }
 
-// A
-// export type BankAccountWithInclude<T extends BankAccountIncludeOptions = {}> =
-//   T extends { bankConnection: true }
-//     ? BankAccount & { bankConnection: BankConnection }
-//     : BankAccount;
-
-
-// B
-type Expand<T> = T extends infer O ? { [K in keyof O]: O[K] } : never;
-
-export type BankAccountWithInclude<T extends BankAccountIncludeOptions = {}> = Expand<
-  BankAccount & 
-    (T extends {bankConnection: true}
-     ? {bankConnection: BankConnection}
-     : {})
->
-
+export type BankAccountWithInclude<T extends BankAccountIncludeOptions | undefined> =
+  Expand<
+    BankAccount &
+      (T extends { bankConnection: true }
+        ? { bankConnection: BankConnection; bankConnectionId: string }
+        : {})
+  >;
 
 export type BankAccount = z.infer<typeof BankAccount>;
 export type BankAccountCreateInput = z.infer<typeof BankAccountCreateInput>;

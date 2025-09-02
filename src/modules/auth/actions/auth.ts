@@ -1,22 +1,19 @@
 "use server";
 
-import { AppwriteException, ID, Query } from "node-appwrite";
-import { cookies } from "next/headers";
-import { CustomError, DefaultError, UnexpectedError } from "@/modules/core/errors";
-import { Response } from "@/modules/core/types";
-import {
-  createAdminClient,
-  createSessionClient,
-} from "@/modules/core/lib/appwrite";
-import { SignInSchema, SignUpSchema } from "@/modules/auth/schemas/index";
-import { APPWRITE_COOKIE_NAME } from "@/modules/core/consts";
-import { User, UserCreateInput } from "@/modules/auth/types";
 import {
   UserAlreadyExistsError,
   UserInvalidCredentialsError,
 } from "@/modules/auth/errors/index";
+import { SignInSchema, SignUpSchema } from "@/modules/auth/schemas/index";
+import { User, UserCreateInput } from "@/modules/auth/types";
 import { createDwollaCustomer } from "@/modules/bankConnection/actions/dwolla";
 import { VerifiedPersonalCustomer } from "@/modules/bankConnection/types";
+import { createAdminClient , createSessionClient} from "@/modules/core/actions/appwrite";
+import { APPWRITE_COOKIE_NAME } from "@/modules/core/consts";
+import { CustomError, DefaultError, UnexpectedError } from "@/modules/core/errors";
+import { Response } from "@/modules/core/types";
+import { cookies } from "next/headers";
+import { AppwriteException, ID, Query } from "node-appwrite";
 
 const { APPWRITE_DB, APPWRITE_USER_COLLECTION } = process.env;
 

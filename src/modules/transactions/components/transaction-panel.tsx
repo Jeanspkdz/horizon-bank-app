@@ -24,11 +24,11 @@ export const TransactionPanel = ({
   bankAccountsPromise,
 }: TransactionPanelProps) => {
   const bankAccounts = use(bankAccountsPromise);
-  const [bankAccountId, setBankAccountId] = useState(bankAccounts[0].externalAccountId);
   
+  const [bankAccountId, setBankAccountId] = useState(bankAccounts[0].id);
 
   const selectedBankAccount = bankAccounts.find(
-    (bankAccount) => bankAccount.externalAccountId === bankAccountId
+    (bankAccount) => bankAccount.id === bankAccountId
   );
 
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -44,7 +44,9 @@ export const TransactionPanel = ({
         setIsLoading(true);
         if (isCancelled) return;
         const transactions = await getBankTransactionsByAccount(
-          selectedBankAccount.id
+         {
+          bankAccountId:  selectedBankAccount.id
+         }
         );
 
         if (!isCancelled) {

@@ -5,29 +5,75 @@ import {
   BankAccountCreateInput,
   BankAccountIncludeOptions,
   BankAccountUpdateInput,
-  BankAccountWithInclude,
 } from "@/modules/bankAccounts/types";
 import { getBankConnectionsByUserId } from "@/modules/bankConnection/actions/bank-connection";
 import { plaidClient } from "@/modules/bankConnection/lib/plaid";
 import { BankConnection } from "@/modules/bankConnection/types";
+import { createAdminClient } from "@/modules/core/actions/appwrite";
 import { DefaultError } from "@/modules/core/errors";
-import { createAdminClient } from "@/modules/core/lib/appwrite";
+import {
+  buildIncludeOptions,
+  buildQueryFilters,
+} from "@/modules/core/lib/query-builders";
+import { ModelIncludeOptions, ModelQueryFilters } from "@/modules/core/types";
 import { ID, Query } from "node-appwrite";
+import { mapToBankAccount } from "../mappers";
 
 const { APPWRITE_DB, APPWRITE_BANK_ACCOUNT_COLLECTION } = process.env;
 
+export async function getBankAccount<
+  T extends ModelQueryFilters<BankAccount>[],
+  const K extends ModelIncludeOptions["BankAccount"]
+>({ queryFilters, includeOptions }: { queryFilters: T; includeOptions?: K }) {
+  const { tableDB } = await createAdminClient();
 
-export async function getBankAccountsByUser<T extends BankAccountIncludeOptions>({
-  userId,
-  include
-}: {userId: string , include? : T}) : Promise<BankAccountWithInclude<T>[]> {
+  const builtQueryFilters = buildQueryFilters(queryFilters);
+  const builtIncludeOptions = buildIncludeOptions(includeOptions);
+
+  const { rows } = await tableDB.listRows({
+    databaseId: APPWRITE_DB!!,
+    tableId: APPWRITE_BANK_ACCOUNT_COLLECTION!!,
+    queries: [...builtQueryFilters, builtIncludeOptions],
+  });
+
+  const bankAccounts = rows.map((row) => mapToBankAccount(row, includeOptions));
+
+  return bankAccounts;
+}
+
+export async function getBankAccountsByBankConnection<
+  IOptions extends BankAccountIncludeOptions
+>(args: { bankConnectionId: string; includeOptions?: IOptions }) {
   try {
-    const bankConnections = await getBankConnectionsByUserId(userId);
+    const bankAccounts = await getBankAccount({
+      queryFilters: [
+        {
+          field: "bankConnectionId",
+          value: args.bankConnectionId,
+        },
+      ],
+      includeOptions: args.includeOptions,
+    });
+
+    return bankAccounts;
+  } catch (error) {
+    console.log("[ERR_GET_BANK_ACCOUNT_BY_BANK_CONNECTION]", error);
+    throw new DefaultError("Error on fetching bank account");
+  }
+}
+
+export async function getBankAccountsByUser<
+  T extends BankAccountIncludeOptions
+>({ userId, include }: { userId: string; include?: T }) {
+  try {
+    const bankConnections = await getBankConnectionsByUserId({
+      userId,
+    });
     const financialUserBankAccounts = await Promise.all(
       bankConnections.map((bankConnection: BankConnection) =>
         getBankAccountsByBankConnection({
           bankConnectionId: bankConnection.id,
-          include,
+          includeOptions: include,
         })
       )
     );
@@ -41,13 +87,15 @@ export async function getBankAccountsByUser<T extends BankAccountIncludeOptions>
 
 export async function updateBankAccountsBalanceByUser(userId: string) {
   try {
-    //Get BankConnectionByUser
-    const bankConnections = await getBankConnectionsByUserId(userId);
+    const bankConnections = await getBankConnectionsByUserId({
+      userId,
+    });
 
     for (const bankConnection of bankConnections) {
       const [bankAccounts, response] = await Promise.all([
         getBankAccountsByBankConnection({
           bankConnectionId: bankConnection.id,
+          includeOptions: { bankConnection: true },
         }),
         plaidClient.accountsBalanceGet({
           access_token: bankConnection.accessToken,
@@ -85,62 +133,34 @@ interface UpdateBankAccountRequest {
   id: string;
   data: BankAccountUpdateInput;
 }
-async function updateBankAccount({ id, data }: UpdateBankAccountRequest) {
+export async function updateBankAccount({
+  id,
+  data,
+}: UpdateBankAccountRequest) {
   try {
-    const { database } = await createAdminClient();
-    const documentCreated = await database.updateDocument(
-      APPWRITE_DB!!,
-      APPWRITE_BANK_ACCOUNT_COLLECTION!!,
-      id,
-      data
-    );
-
-    const bankAccountUpdated: BankAccount = {
-      id: documentCreated.$id,
-      externalAccountId: documentCreated.externalAccountId,
-      fundingSourceUrl: documentCreated.fundingSourceUrl,
-      name: documentCreated.name,
-      officialName: documentCreated.officialName,
-      type: documentCreated.type,
-      subtype: documentCreated.subtype,
-      balance: documentCreated.balance,
-      bankConnectionId: documentCreated.bankConnectionId,
-      shareableId: documentCreated.shareableId
-    };
-
-    return bankAccountUpdated;
+    const { tableDB } = await createAdminClient();
+    const updatedRow = await tableDB.updateRow({
+      databaseId: APPWRITE_DB!!,
+      tableId: APPWRITE_BANK_ACCOUNT_COLLECTION!!,
+      rowId: id,
+      data,
+    });
   } catch (error) {
     console.log("[ERR_UPDATE_BANK_ACCOUNT]", error);
     throw new DefaultError("Error creating bank account");
   }
 }
 
-export async function createBankAccount(
-  bankAccount: BankAccountCreateInput
-): Promise<BankAccount> {
+export async function createBankAccount(bankAccount: BankAccountCreateInput) {
   try {
-    const { database } = await createAdminClient();
-    const documentCreated = await database.createDocument(
-      APPWRITE_DB!!,
-      APPWRITE_BANK_ACCOUNT_COLLECTION!!,
-      ID.unique(),
-      bankAccount
-    );
+    const { tableDB } = await createAdminClient();
 
-    const bankAccountCreated: BankAccount = {
-      id: documentCreated.$id, // Usamos el id generado por Appwrite
-      externalAccountId: documentCreated.externalAccountId,
-      fundingSourceUrl: documentCreated.fundingSourceUrl,
-      name: documentCreated.name,
-      officialName: documentCreated.officialName,
-      type: documentCreated.type,
-      subtype: documentCreated.subtype,
-      balance: documentCreated.balance,
-      bankConnectionId: documentCreated.bankConnectionId,
-      shareableId: crypto.randomUUID()
-    };
-
-    return bankAccountCreated;
+    const createdRow = await tableDB.createRow({
+      databaseId: APPWRITE_DB!!,
+      tableId: APPWRITE_BANK_ACCOUNT_COLLECTION!!,
+      rowId: ID.unique(),
+      data: { ...bankAccount, shareableId: crypto.randomUUID() },
+    });
   } catch (error) {
     console.log("[ERR_CREATE_BANK_ACCOUNT]", error);
     throw new DefaultError("Error creating bank account");
@@ -170,71 +190,44 @@ export async function getBankAccountsFromPlaid(accessToken: string) {
 //    params: { bankConnectionId: string; include: { bankConnection: boolean } }
 // ): Promise<BankAccountWithBankConnection[]>;
 
-export async function getBankAccountsByBankConnection<T extends BankAccountIncludeOptions>(
-  params: { bankConnectionId: string; include?: T}
-) : Promise<BankAccountWithInclude<T>[]>{
-  try {
-    const { database } = await createAdminClient();
-    const documentsList = await database.listDocuments(
-      APPWRITE_DB!!,
-      APPWRITE_BANK_ACCOUNT_COLLECTION!!,
-      [Query.equal("bankConnectionId", params.bankConnectionId)]
-    );
-    const bankAccountsDocuments = documentsList.documents;
-    const bankAccounts = bankAccountsDocuments.map((account) => {
-      const bankAccount : BankAccount  = {
-        id: account["$id"],
-        externalAccountId: account["externalAccountId"],
-        name: account["name"],
-        officialName: account["officialName"],
-        type: account["type"],
-        subtype: account["subtype"],
-        balance: account["balance"],
-        fundingSourceUrl: account["fundingSourceUrl"],
-        bankConnectionId: account["bankConnectionId"].$id,
-        shareableId: account["shareableId"]
-      };
+export async function getBankAccountById(id: string) {
+  const { tableDB } = await createAdminClient();
+  const row = await tableDB.getRow({
+    databaseId: APPWRITE_DB!!,
+    tableId: APPWRITE_BANK_ACCOUNT_COLLECTION!!,
+    rowId: id,
+    queries: [Query.select(["*"])],
+  });
 
-      if (params.include?.bankConnection) {
-        const bankAccountWithBankConnection = {
-          ...bankAccount,
-          bankConnection: account["bankConnectionId"],
-        };
-        return bankAccountWithBankConnection as BankAccountWithInclude<T> ;
-      }
-
-      return bankAccount as BankAccountWithInclude<T>;
-    });
-
-    return bankAccounts;
-  } catch (error) {
-    console.log("[ERR_GET_BANK_ACCOUNT_BY_BANK_CONNECTIOIN]", error);
-    throw new DefaultError("Error on fetching bank account");
-  }
+  return mapToBankAccount(row, { bankConnection: false });
 }
 
 export async function getCursorByBankAccount(
   accountId: string
 ): Promise<string | null> {
-  const { database } = await createAdminClient();
-  const documentsResponse = await database.getDocument(
-    APPWRITE_DB!!,
-    APPWRITE_BANK_ACCOUNT_COLLECTION!!,
-    accountId
-  );
-  return documentsResponse["transactionCursor"];
+  const { database, tableDB } = await createAdminClient();
+
+  const response = await tableDB.getRow({
+    databaseId: APPWRITE_DB!!,
+    tableId: APPWRITE_BANK_ACCOUNT_COLLECTION!!,
+    rowId: accountId,
+  });
+
+  return response["transactionCursor"];
 }
 
 export async function updateCursorByBankAccount(
   accountId: string,
   cursor: string
 ): Promise<string | null> {
-  const { database } = await createAdminClient();
-  const documentsResponse = await database.updateDocument(
-    APPWRITE_DB!!,
-    APPWRITE_BANK_ACCOUNT_COLLECTION!!,
-    accountId,
-    {transactionCursor: cursor}
-  );
-  return documentsResponse["transactionCursor"];
+  const { database, tableDB } = await createAdminClient();
+
+  const response = await tableDB.updateRow({
+    databaseId: APPWRITE_DB!!,
+    tableId: APPWRITE_BANK_ACCOUNT_COLLECTION!!,
+    rowId: accountId,
+    data: { transactionCursor: cursor },
+  });
+
+  return response["transactionCursor"];
 }

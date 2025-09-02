@@ -30,7 +30,7 @@ export const BankCardSelect = ({bankAccounts, value, onValueChange}: BankCardSel
           <SelectLabel>Select a Bank to Display</SelectLabel>
           {bankAccounts.map((bankAccount) => (
             <SelectItem
-              value={bankAccount.externalAccountId}
+              value={bankAccount.id}
               key={bankAccount.id}
               className="px-6"
             >

@@ -1,8 +1,8 @@
-"use server";
-
-import { Client, Account, Databases } from "node-appwrite";
-import { cookies } from "next/headers";
+"use server"
 import { APPWRITE_COOKIE_NAME } from "@/modules/core/consts";
+import { cookies } from "next/headers";
+import { Account, Client, Databases, TablesDB } from "node-appwrite";
+
 
 export async function createSessionClient() {
   const client = new Client()
@@ -38,5 +38,8 @@ export async function createAdminClient() {
     get database() {
       return new Databases(client);
     },
+    get tableDB() {
+      return new TablesDB(client)
+    }
   };
 }

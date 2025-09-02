@@ -9,9 +9,9 @@ export const TransferFormSchema = z.object({
     .trim(),
   sharableId: z.coerce
     .string()
-    .min(1, { message: "Enter a sharable ID" })
-    .trim(),
-  amount: z.coerce.number().min(1, { message: "Enter a valid amount" }),
+    .trim()
+    .uuid({message:"Enter a valid shareable ID"}),
+  amount: z.coerce.number().gte(5, {message: "The minimum amount allowed is 5"}),
 });
 
 export type TransferFormSchema = z.infer<typeof TransferFormSchema>;

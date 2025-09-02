@@ -6,9 +6,15 @@ import {
   updateCursorByBankAccount,
 } from "@/modules/bankAccounts/actions";
 import { plaidClient } from "@/modules/bankConnection/lib/plaid";
-import { createAdminClient } from "@/modules/core/lib/appwrite";
+import { createAdminClient } from "@/modules/core/actions/appwrite";
 import { isPlaidError } from "@/modules/core/lib/plaid";
 import {
+  buildIncludeOptions,
+  buildQueryFilters,
+} from "@/modules/core/lib/query-builders";
+import { ModelIncludeOptions, ModelQueryFilters } from "@/modules/core/types";
+import {
+  BankTransactionIncludeOptions,
   Transaction,
   TransactionCreateInput,
   TransactionId,
@@ -16,6 +22,7 @@ import {
 } from "@/modules/transactions/types";
 import { ID, Query } from "node-appwrite";
 import { TransactionsSyncRequest } from "plaid";
+import { mapToBankTransaction } from "../mappers";
 
 const { APPWRITE_DB, APPWRITE_TRANSACTION_COLLECTION } = process.env;
 
@@ -29,7 +36,6 @@ export async function updateBankTransactionsByAccount({
   id,
   externalAccountId,
 }: UpdateBankTransactionsByAccountRequest) {
-
   //Get the cursor from the last sync
   let cursor = await getCursorByBankAccount(id);
   let tempCursor = cursor;
@@ -116,8 +122,8 @@ export async function updateBankTransactionsByUser(userId: string) {
   const bankAccounts = await getBankAccountsByUser({
     userId,
     include: {
-      bankConnection: true
-    }
+      bankConnection: true,
+    },
   });
   // For each bankAccount update its transactions
   Promise.all(
@@ -128,7 +134,7 @@ export async function updateBankTransactionsByUser(userId: string) {
         accessToken: bankAccount.bankConnection.accessToken,
       });
     })
-  ); 
+  );
 }
 
 interface GetBankTransactionsRequest {
@@ -156,17 +162,17 @@ async function getBankTransactionsByAccountFromPlaid({
 async function createBankTransactions(transactions: TransactionCreateInput[]) {
   console.log("Starting Creating transactions!!!!");
   console.log(transactions);
-  const { database } = await createAdminClient();
+  const { tableDB } = await createAdminClient();
 
   // const response = await database.createDocuments() // Bulk create is not supported for collections with relationship
   await Promise.all(
     transactions.map(async (transaction) => {
-      const documents = await database.createDocument(
-        APPWRITE_DB!!,
-        APPWRITE_TRANSACTION_COLLECTION!!,
-        ID.unique(),
-        { ...transaction }
-      );
+      const response = await tableDB.createRow({
+        databaseId: APPWRITE_DB!!,
+        tableId: APPWRITE_TRANSACTION_COLLECTION!!,
+        rowId: ID.unique(),
+        data: { ...transaction },
+      });
     })
   );
 
@@ -178,24 +184,27 @@ async function updateBankTransactions(
 ) {
   console.log("Updating transactions!!!!");
 
-  const { database } = await createAdminClient();
+  const { tableDB } = await createAdminClient();
 
-  const a = await Promise.all(
+  const responses = await Promise.all(
     Object.entries(transactionUpdateMap).map(
       async ([externalTransactionId, value]) => {
-        const { documents } = await database.listDocuments(
-          APPWRITE_DB!!,
-          APPWRITE_TRANSACTION_COLLECTION!!,
-          [Query.equal("externalTransactionId", externalTransactionId)]
-        );
-        const document = documents[0];
+        const { rows } = await tableDB.listRows({
+          databaseId: APPWRITE_DB!!,
+          tableId: APPWRITE_TRANSACTION_COLLECTION!!,
+          queries: [
+            Query.equal("externalTransactionId", externalTransactionId),
+          ],
+        });
 
-        const updatedDocument = await database.updateDocument(
-          APPWRITE_DB!!,
-          APPWRITE_TRANSACTION_COLLECTION!!,
-          document.$id,
-          { ...value }
-        );
+        const row = rows[0];
+
+        const updatedRow = await tableDB.updateRow({
+          databaseId: APPWRITE_DB!!,
+          tableId: APPWRITE_TRANSACTION_COLLECTION!!,
+          rowId: row.$id,
+          data: { ...value },
+        });
       }
     )
   );
@@ -205,51 +214,78 @@ async function updateBankTransactions(
 async function deleteBankTransactions(deletedTransactionIds: TransactionId[]) {
   console.log("Deleting transactions!!!!");
 
-  const { database } = await createAdminClient();
+  const { tableDB } = await createAdminClient();
 
   await Promise.all(
     deletedTransactionIds.map(async (deleteBankTransactionId) => {
-      const { documents } = await database.listDocuments(
-        APPWRITE_DB!!,
-        APPWRITE_TRANSACTION_COLLECTION!!,
-        [Query.equal("externalTransactionId", deleteBankTransactionId)]
-      );
+      const { rows } = await tableDB.listRows({
+        databaseId: APPWRITE_DB!!,
+        tableId: APPWRITE_TRANSACTION_COLLECTION!!,
+        queries: [
+          Query.equal("externalTransactionId", deleteBankTransactionId),
+        ],
+      });
 
-      const document = documents[0];
+      const row = rows[0];
 
-      await database.deleteDocument(
-        APPWRITE_DB!!,
-        APPWRITE_TRANSACTION_COLLECTION!!,
-        document.$id
-      );
+      await tableDB.deleteRow({
+        databaseId: APPWRITE_DB!!,
+        tableId: APPWRITE_TRANSACTION_COLLECTION!!,
+        rowId: row.$id,
+      });
     })
   );
 
   console.log("Finishing Deleting transactions!!!!");
 }
 
-export async function getBankTransactionsByAccount(bankAccountId: string) {
-  const { database } = await createAdminClient();
+export async function getBankTransactions<
+  QFilters extends ModelQueryFilters<Transaction>[],
+  IOptions extends ModelIncludeOptions["Transaction"]
+>({
+  queryFilters,
+  includeOptions,
+}: {
+  queryFilters: QFilters;
+  includeOptions?: IOptions;
+}) {
+  const { tableDB } = await createAdminClient();
 
-  const { documents } = await database.listDocuments(
-    APPWRITE_DB!!,
-    APPWRITE_TRANSACTION_COLLECTION!!,
-    [Query.equal("bankAccountId", bankAccountId)]
+  const builtQueryFilters = buildQueryFilters(queryFilters);
+  const builtIncludeOptions = buildIncludeOptions(includeOptions);
+
+  const { rows } = await tableDB.listRows({
+    databaseId: APPWRITE_DB!!,
+    tableId: APPWRITE_TRANSACTION_COLLECTION!!,
+    queries: [...builtQueryFilters, builtIncludeOptions],
+  });
+
+  const bankConnections = rows.map((row) =>
+    mapToBankTransaction(row, includeOptions)
   );
 
-  const transactions: Transaction[] = documents.map(
-    (doc): Transaction => ({
-      id: doc["$id"],
-      amount: doc["amount"],
-      status: doc["status"],
-      category: doc["category"],
-      merchantName: doc["merchantName"],
-      merchantLogoUrl: doc["merchantLogoUrl"],
-      datetime: doc["datetime"],
-      bankAccountId: doc["bankAccountId"],
-      externalTransactionId: doc["externalTransactionId"],
-    })
-  );
+  return bankConnections;
+}
 
-  return transactions;
+export async function getBankTransactionsByAccount<
+  IOptions extends BankTransactionIncludeOptions
+>({
+  bankAccountId,
+  includeOptions,
+}: {
+  bankAccountId: string;
+  includeOptions?: IOptions;
+}) {
+  const bankTransactions = await getBankTransactions({
+    queryFilters: [
+      {
+        field: "bankAccountId",
+        value: bankAccountId,
+        operator: "equal",
+      },
+    ],
+    includeOptions,
+  });
+
+  return bankTransactions;
 }

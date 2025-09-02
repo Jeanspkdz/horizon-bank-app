@@ -1,4 +1,4 @@
-import { CreditCardSkeleton } from "@/modules/core/components/credit-card--skeleton";
+import { CreditCardSkeleton } from "@/modules/core/components/credit-card-skeleton";
 
 export const UserBankAccountListSkeleton = () => {
   return (

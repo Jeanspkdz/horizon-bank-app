@@ -16,9 +16,8 @@ const DashboardLayout = async ({
   }
   
   const user = response.data
-  console.log("NANI??");
   
-  syncUserBankData(user.id)
+  // syncUserBankData(user.id)
 
   return (
     <SidebarProvider className="block">

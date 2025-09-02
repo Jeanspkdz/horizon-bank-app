@@ -17,6 +17,7 @@ import { TransferFormSchema } from "@/modules/transfers/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Suspense } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { makeTransfer } from "../actions";
 
 interface TransferPanelProps {
   bankAccountsPromise: Promise<BankAccount[]>;
@@ -34,8 +35,15 @@ export const TransferPanel = ({ bankAccountsPromise }: TransferPanelProps) => {
     },
   });
 
-  const onSubmit: SubmitHandler<TransferFormSchema> = (values) => {
-    console.log(values);
+  const onSubmit: SubmitHandler<TransferFormSchema> = async (values) => {
+    console.log(values);  
+    await makeTransfer({
+      amount: values.amount,
+      receiverEmail: values.recipientEmail,
+      senderBankAccountId: values.bankAccountId,
+      shareableId: values.sharableId,
+      note: values.note
+    })
   };
 
   return (
