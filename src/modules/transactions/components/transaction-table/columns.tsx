@@ -82,7 +82,8 @@ export const defaultColumns = [
         <ArrowUpDown />
       </Button>
     ),
-    id: "datetime"
+    id: "datetime",
+    invertSorting: true
   }),
   columnHelper.accessor("category", {
     cell: (info) => <Badge className="capitalize">{info.getValue()}</Badge>,

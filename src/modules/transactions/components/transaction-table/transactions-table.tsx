@@ -32,7 +32,9 @@ export const TransactionsTable = ({ data }: TransactionsTableProps) => {
     pageSize: 12,
   });
 
-  const [sorting, setSorting] = useState<SortingState>([]);
+  const [sorting, setSorting] = useState<SortingState>([
+    { id: "datetime", desc: false },
+  ]);
 
   const table = useReactTable({
     data,
@@ -53,7 +55,7 @@ export const TransactionsTable = ({ data }: TransactionsTableProps) => {
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
+            <TableRow key={headerGroup.id} className="border-b bg-muted/50">
               {headerGroup.headers.map((header) => {
                 const columnsLength = headerGroup.headers.length || 1;
                 const style = {
@@ -63,7 +65,7 @@ export const TransactionsTable = ({ data }: TransactionsTableProps) => {
                 return (
                   <TableHead
                     key={header.id}
-                    className="text-gray-500 font-medium min-w-[150px] "
+                    className="text-gray-500 font-medium min-w-[150px] py-3"
                     style={style}
                     onClick={header.column.getToggleSortingHandler()}
                   >
@@ -112,7 +114,7 @@ export const TransactionsTable = ({ data }: TransactionsTableProps) => {
       </Table>
 
       {/* Pagination */}
-      {table.getRowModel().rows.length  > 0 && (
+      {table.getRowModel().rows.length > 0 && (
         <div className="mt-6">
           <div className="flex justify-between items-center">
             <Button
