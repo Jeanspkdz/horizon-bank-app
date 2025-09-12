@@ -35,7 +35,7 @@ export function mapToBankConnection<IOptions extends BankConnectionIncludeOption
   }
 
   const parsed = schema.safeParse(normalizedDocument);
-  console.log("MAP PARSED", parsed);
+  // console.log("MAP PARSED", parsed);
 
   if (!parsed.success) {
     throw new DefaultError("Failed to parse BankAccount");

@@ -22,6 +22,9 @@ export async function makeTransfer({
   receiverEmail,
 }: MakeTransferParams) {
   try {
+    console.log("NOTE", note);
+    
+
     const senderBankAcccount = await getBankAccountById(senderBankAccountId);
     console.log("SENDER", senderBankAcccount);
 
@@ -29,13 +32,8 @@ export async function makeTransfer({
       queryFilters: [
         { field: "shareableId", value: shareableId, operator: "equal" },
       ],
-      // includeOptions: {
-      //   bankConnection: true
-      // }
     });
     console.log("RECEIVER", receiverBankAccount);
-
-    //TODO: Validate email
 
     const requestBody = {
       _links: {
@@ -50,14 +48,10 @@ export async function makeTransfer({
         currency: "USD",
         value: amount.toString(),
       },
-      metadata: {
-        note,
-      },
     };
-
-    const response = await dwollaClient.post("/transfers", requestBody);
-    console.log("TRASNFER_RESPONSE!!!", response.headers.get("location"));
+    const response = await dwollaClient.post("transfers", requestBody);
+    console.log("TRANSFER_RESPONSE!!!", response.headers.get("location"));
   } catch (error) {
-    console.log("[ERR_MAKE_TRASNFER]", error);
+    console.log("[ERR_MAKE_TRANSFER]", error);
   }
 }

@@ -7,6 +7,7 @@ import {
 } from "@/modules/bankAccounts/actions";
 import { plaidClient } from "@/modules/bankConnection/lib/plaid";
 import { createAdminClient } from "@/modules/core/actions/appwrite";
+import { PlaidReconnectionError } from "@/modules/core/errors";
 import { isPlaidError } from "@/modules/core/lib/plaid";
 import {
   buildIncludeOptions,
@@ -23,6 +24,7 @@ import {
 import { ID, Query } from "node-appwrite";
 import { TransactionsSyncRequest } from "plaid";
 import { mapToBankTransaction } from "../mappers";
+import { cleanTransactionName } from "../utils";
 
 const { APPWRITE_DB, APPWRITE_TRANSACTION_COLLECTION } = process.env;
 
@@ -97,14 +99,23 @@ export async function updateBankTransactionsByAccount({
       tempCursor = cursor;
       cursor = next_cursor;
     } catch (error) {
-      if (
-        isPlaidError(error) &&
-        error.response?.data?.error_code ===
+      if (isPlaidError(error)) {
+        if (
+          error.response?.data?.error_code ===
           "TRANSACTIONS_SYNC_MUTATION_DURING_PAGINATION"
-      ) {
-        cursor = tempCursor;
-        hasMore = true;
-        continue; //Retry using the temporal cursor
+        ) {
+          cursor = tempCursor;
+          hasMore = true;
+          continue; //Retry using the temporal cursor
+        } else if (error.response?.data?.error_code === "ITEM_LOGIN_REQUIRED") {
+          throw new PlaidReconnectionError(
+            "Reconnection Error",
+            accessToken,
+            externalAccountId
+          );
+        } else {
+          throw error;
+        }
       } else {
         throw error;
       }
@@ -126,7 +137,7 @@ export async function updateBankTransactionsByUser(userId: string) {
     },
   });
   // For each bankAccount update its transactions
-  Promise.all(
+  await Promise.all(
     bankAccounts.map(async (bankAccount) => {
       return await updateBankTransactionsByAccount({
         id: bankAccount.id,

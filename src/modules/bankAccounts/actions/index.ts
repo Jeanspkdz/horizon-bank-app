@@ -10,14 +10,19 @@ import { getBankConnectionsByUserId } from "@/modules/bankConnection/actions/ban
 import { plaidClient } from "@/modules/bankConnection/lib/plaid";
 import { BankConnection } from "@/modules/bankConnection/types";
 import { createAdminClient } from "@/modules/core/actions/appwrite";
-import { DefaultError } from "@/modules/core/errors";
+import { DefaultError, PlaidReconnectionError } from "@/modules/core/errors";
 import {
   buildIncludeOptions,
   buildQueryFilters,
 } from "@/modules/core/lib/query-builders";
-import { ModelIncludeOptions, ModelQueryFilters } from "@/modules/core/types";
+import {
+  ModelIncludeOptions,
+  ModelQueryFilters,
+  Response,
+} from "@/modules/core/types";
 import { ID, Query } from "node-appwrite";
 import { mapToBankAccount } from "../mappers";
+import { isPlaidError } from "@/modules/core/lib/plaid";
 
 const { APPWRITE_DB, APPWRITE_BANK_ACCOUNT_COLLECTION } = process.env;
 
@@ -85,44 +90,61 @@ export async function getBankAccountsByUser<
   }
 }
 
-export async function updateBankAccountsBalanceByUser(userId: string) {
+export async function updateBankAccountsBalanceByUser(
+  userId: string
+): Promise<Response<unknown>> {
   try {
     const bankConnections = await getBankConnectionsByUserId({
       userId,
     });
 
     for (const bankConnection of bankConnections) {
-      const [bankAccounts, response] = await Promise.all([
-        getBankAccountsByBankConnection({
-          bankConnectionId: bankConnection.id,
-          includeOptions: { bankConnection: true },
-        }),
-        plaidClient.accountsBalanceGet({
-          access_token: bankConnection.accessToken,
-        }),
-      ]);
+      try {
+        const [bankAccounts, response] = await Promise.all([
+          getBankAccountsByBankConnection({
+            bankConnectionId: bankConnection.id,
+            includeOptions: { bankConnection: true },
+          }),
+          plaidClient.accountsBalanceGet({
+            access_token: bankConnection.accessToken, // debo obtener este access token
+          }),
+        ]);
 
-      const accounts = response.data.accounts;
+        const accounts = response.data.accounts;
 
-      // Update balance on each account
-      await Promise.all(
-        accounts.map((account) => {
-          const bankAccountMatched = bankAccounts.find(
-            (bankAccount) => bankAccount.externalAccountId == account.account_id
-          );
+        // Update balance on each account
+        await Promise.all(
+          accounts.map((account) => {
+            const bankAccountMatched = bankAccounts.find(
+              (bankAccount) =>
+                bankAccount.externalAccountId == account.account_id
+            );
 
-          if (bankAccountMatched == null) return Promise.resolve();
+            if (bankAccountMatched == null) return Promise.resolve();
 
-          return updateBankAccount({
-            id: bankAccountMatched.id,
-            data: {
-              balance:
-                account.balances.available ?? account.balances.current ?? 0,
-            },
-          });
-        })
-      );
+            return updateBankAccount({
+              id: bankAccountMatched.id,
+              data: {
+                balance:
+                  account.balances.available ?? account.balances.current ?? 0,
+              },
+            });
+          })
+        );
+      } catch (error) {
+         if (isPlaidError(error) && error.response?.data.error_code === 'ITEM_LOGIN_REQUIRED') {
+          return {
+            success: false,
+            error: new PlaidReconnectionError(
+              'ITEM_LOGIN_REQUIRED',
+              bankConnection.accessToken,
+              bankConnection.id
+            )
+          };
+        }
+      }
     }
+    return { success: true, data: null };
   } catch (error) {
     console.log("[ERR_UPDATE_BANK_ACCOUNTS_BALANCE]", error);
     throw new DefaultError("Error on updating balance");
@@ -139,7 +161,7 @@ export async function updateBankAccount({
 }: UpdateBankAccountRequest) {
   try {
     const { tableDB } = await createAdminClient();
-    const updatedRow = await tableDB.updateRow({
+    await tableDB.updateRow({
       databaseId: APPWRITE_DB!!,
       tableId: APPWRITE_BANK_ACCOUNT_COLLECTION!!,
       rowId: id,
@@ -155,7 +177,7 @@ export async function createBankAccount(bankAccount: BankAccountCreateInput) {
   try {
     const { tableDB } = await createAdminClient();
 
-    const createdRow = await tableDB.createRow({
+    await tableDB.createRow({
       databaseId: APPWRITE_DB!!,
       tableId: APPWRITE_BANK_ACCOUNT_COLLECTION!!,
       rowId: ID.unique(),

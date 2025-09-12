@@ -17,3 +17,14 @@ export class UnexpectedError extends CustomError {
     this.name = "UnexpectedError"
   }
 }
+
+export class PlaidReconnectionError extends CustomError {
+  constructor(
+    message: string,
+    public readonly accessToken: string,
+    public readonly bankConnectionId: string
+  ) {
+    super(message);
+    this.name = 'PlaidReconnectionError';
+  }
+}

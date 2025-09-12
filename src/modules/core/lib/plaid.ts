@@ -1,22 +1,12 @@
-interface PlaidErrorResponse {
-  error_code: string;
-  error_message: string;
-  display_message?: string;
-  request_id?: string;
-}
+import { AxiosError } from "axios";
 
-export function isPlaidError(
-  error: unknown
-): error is { response: { data: PlaidErrorResponse } } {
+
+export function isPlaidError(error: unknown): error is AxiosError<any> {
   return (
     typeof error === "object" &&
     error !== null &&
-    "response" in error &&
-    typeof error.response === "object" &&
-    error.response !== null &&
-    "data" in error.response &&
-    typeof error.response.data === "object" &&
-    error.response.data !== null &&
-    "error_code" in error.response.data
+    "isAxiosError" in error &&
+    (error as any).isAxiosError === true
   );
 }
+

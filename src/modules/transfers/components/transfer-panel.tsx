@@ -18,6 +18,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Suspense } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { makeTransfer } from "../actions";
+import { Loader } from "lucide-react";
 
 interface TransferPanelProps {
   bankAccountsPromise: Promise<BankAccount[]>;
@@ -36,14 +37,14 @@ export const TransferPanel = ({ bankAccountsPromise }: TransferPanelProps) => {
   });
 
   const onSubmit: SubmitHandler<TransferFormSchema> = async (values) => {
-    console.log(values);  
+    console.log(values);
     await makeTransfer({
       amount: values.amount,
       receiverEmail: values.recipientEmail,
       senderBankAccountId: values.bankAccountId,
       shareableId: values.sharableId,
-      note: values.note
-    })
+      note: values.note,
+    });
   };
 
   return (
@@ -71,7 +72,9 @@ export const TransferPanel = ({ bankAccountsPromise }: TransferPanelProps) => {
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <Suspense fallback={<Skeleton className="w-[190px] h-10"/>}>
+                        <Suspense
+                          fallback={<Skeleton className="w-[190px] h-10" />}
+                        >
                           <AsyncBankCardSelect
                             bankAccontsPromise={bankAccountsPromise}
                             onValueChange={field.onChange}
@@ -197,8 +200,13 @@ export const TransferPanel = ({ bankAccountsPromise }: TransferPanelProps) => {
         <Button
           className="mt-8 w-full py-6 bg-brand-blue hover:bg-brand-blue/90 hover:cursor-pointer"
           type="submit"
+          disabled={form.formState.isSubmitting}
         >
-          Transfer Funds
+          {form.formState.isSubmitting ? (
+            <Loader className="animate-spin" />
+          ) : (
+            "Transfer Funds"
+          )}
         </Button>
       </form>
     </Form>

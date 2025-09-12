@@ -11,7 +11,6 @@ import { DefaultError } from "@/modules/core/errors";
 export function mapToBankTransaction<
   IOptions extends BankTransactionIncludeOptions
 >(document: Models.DefaultRow & Record<string, unknown>, include?: IOptions) {
-  console.log("DOC_TRANSACTION TO MAP", document);
 
   let schema = Transaction;
 
@@ -43,7 +42,7 @@ export function mapToBankTransaction<
   }
 
   const parsed = schema.safeParse(normalizedDocument);
-  console.log("MAP PARSED", parsed);
+  // console.log("MAP PARSED", parsed);
 
   if (!parsed.success) {
     console.log(parsed.error.format());

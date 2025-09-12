@@ -23,6 +23,38 @@ import {
   Products,
 } from "plaid";
 
+export async function createLinkTokenForUpdateMode(
+  user: User,
+  accessToken: string
+): Promise<Response<LinkToken>> {
+  const request = {
+    client_name: `${user.firstName} ${user.lastName}`,
+    language: "en",
+    country_codes: ["US"] as CountryCode[],
+    user: {
+      client_user_id: user.accountId,
+    },
+    access_token:  accessToken,
+  } satisfies LinkTokenCreateRequest;
+
+  try {
+    const response = await plaidClient.linkTokenCreate(request);
+    const linkToken = response.data.link_token;
+
+    return {
+      success: true,
+      data: linkToken,
+    };
+  } catch (error) {
+    console.log("[ERR_CREATE_LINK_TOKEN]", error);
+
+    return {
+      success: false,
+      error: new DefaultError("Something went wrong"),
+    };
+  }
+}
+
 export async function createLinkToken(
   user: User
 ): Promise<Response<LinkToken>> {
