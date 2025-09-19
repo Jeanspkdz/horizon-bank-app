@@ -33,7 +33,6 @@ export const HomePanel = async () => {
     })
   );
   const transactionsFlatted = transactions.flat(1);
-  console.log("FLATTED", transactionsFlatted);
   
   let transactionsGrouped = Object.groupBy(
     transactionsFlatted,
@@ -41,8 +40,8 @@ export const HomePanel = async () => {
   ) as Record<string, Transaction[]>;
 
   return (
-    <div className="flex w-full h-full">
-      <div className="flex-1 p-5">
+    <div className="flex">
+      <div className="w-full p-5">
         <div className="mb-8">
           <Heading
             type="greeting"
@@ -52,22 +51,22 @@ export const HomePanel = async () => {
           />
         </div>
 
-        <div>
+        {/* <div>
           <DoughnutChart
             data={bankAccounts}
             dataKey={"balance"}
             nameKey={"name"}
           />
-        </div>
+        </div> */}
 
-        <div className="mt-8">
+        <div className="mt-8 max-w-full">
           <TransactionsTab
             transactions={transactionsGrouped}
           />
         </div>
       </div>
 
-      <div className="hidden lg:block">
+      <div className="hidden xl:block">
         <RightSidebar
           bankAccounts={bankAccounts}
           email={user!.email}

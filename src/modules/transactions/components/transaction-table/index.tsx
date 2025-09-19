@@ -52,8 +52,8 @@ export const TransactionsTable = ({ data, showFull = true}: TransactionsTablePro
   });
 
   return (
-    <div>
-      <Table>
+    <div className="">
+      <Table className="">
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id} className="border-b bg-muted/50">
@@ -96,7 +96,7 @@ export const TransactionsTable = ({ data, showFull = true}: TransactionsTablePro
                 )}
               >
                 {row.getAllCells().map((cell) => (
-                  <TableCell key={cell.id}>
+                  <TableCell key={cell.id} className="max-w-[12ch] truncate">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>
                 ))}

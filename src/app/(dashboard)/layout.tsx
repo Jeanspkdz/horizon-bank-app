@@ -22,12 +22,12 @@ const DashboardLayout = async ({
     <SidebarProvider className="block">
       <Navbar />
 
-      <main className="w-full min-h-svh flex">
+      <main className="max-w-dvw min-h-svh flex">
         <Sidebar
           username={`${user.firstName} ${user.lastName}`}
           email={user.email}
         />
-        <section className="flex-1 bg-[#FCFCFD]">{children}</section>
+        <section className=" bg-[#FCFCFD]  max-w-full flex-1">{children}</section>
       </main>
 
       <Toaster richColors/>

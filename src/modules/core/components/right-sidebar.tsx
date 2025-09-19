@@ -38,8 +38,6 @@ export const RightSidebar = ({
 
   const totalCategories = transactions.length
 
-  console.log("CATEGORIES", topThreeCategories);
-
   return (
     <aside className="lg:flex lg:flex-col lg:w-[355px] lg:h-full border-l border-l-slate-400/30">
       <div className="h-32 bg-[url(/images/gradient-mesh.svg)] bg-cover" />
@@ -94,8 +92,6 @@ export const RightSidebar = ({
               {Object.entries(topThreeCategories).map(([key, val] ,index) => {
                 const amount = val.length
                 const percentaje = Math.round((amount / totalCategories) * 100)
-                console.log(percentaje);
-                
 
                 return (
                   <CategoryCountBar

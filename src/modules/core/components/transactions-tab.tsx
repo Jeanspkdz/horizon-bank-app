@@ -14,7 +14,7 @@ export const TransactionsTab = ({ transactions }: TransactionsTabProps) => {
       <h2 className="text-2xl font-bold mb-4">Recent Transactions</h2>
 
       <Tabs defaultValue={transactionsName[0]}>
-        <TabsList className="bg-transparent">
+        <TabsList className="bg-transparent flex flex-wrap gap-y-2">
           {transactionsName.map((name) => (
             <TabsTrigger
               value={name}

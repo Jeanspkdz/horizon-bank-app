@@ -4,7 +4,7 @@ import { Button } from "@/modules/core/components/ui/button";
 
 export const RightSidebarSkeleton = () => {
   return (
-    <aside className="lg:flex lg:flex-col lg:w-[355px] lg:h-full border-l border-l-slate-400/30">
+    <aside className="hidden xl:flex xl:flex-col xl:w-[355px] xl:h-full border-l border-l-slate-400/30">
       {/* Header gradient background */}
       <Skeleton className="h-32 " />
 

@@ -33,7 +33,7 @@ export const defaultColumns = [
           </div>
         )}
 
-        <span>{info.renderValue()}</span>
+        <span className="max-w-[12ch] truncate" title={info.getValue()}>{info.renderValue()}</span>
       </div>
     ),
     id: "transaction",
