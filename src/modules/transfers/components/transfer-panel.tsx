@@ -19,6 +19,7 @@ import { Suspense } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { makeTransfer } from "../actions";
 import { Loader } from "lucide-react";
+import { toast } from "sonner";
 
 interface TransferPanelProps {
   bankAccountsPromise: Promise<BankAccount[]>;
@@ -38,13 +39,18 @@ export const TransferPanel = ({ bankAccountsPromise }: TransferPanelProps) => {
 
   const onSubmit: SubmitHandler<TransferFormSchema> = async (values) => {
     console.log(values);
-    await makeTransfer({
+    const response = await makeTransfer({
       amount: values.amount,
-      receiverEmail: values.recipientEmail,
       senderBankAccountId: values.bankAccountId,
       shareableId: values.sharableId,
       note: values.note,
     });
+
+    if (response.success) {
+      toast.success("Transaction completed successfully");
+    } else {
+      toast.error("Transaction could not be completed");
+    }
   };
 
   return (

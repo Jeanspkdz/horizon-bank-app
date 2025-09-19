@@ -34,6 +34,14 @@ export const TransactionPanel = ({
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
+  const totalBalance = transactions.reduce((acc, current) => {
+      return acc += current.amount
+  }, 0)
+
+  // In development/sandbox, balance may not be accurate due to Plaid sandbox limitations.
+  // In production, this will reflect the real total balance.
+  console.log("TOTAL BALANCE", totalBalance);
+
   useEffect(() => {
     if (selectedBankAccount == null) return;
 

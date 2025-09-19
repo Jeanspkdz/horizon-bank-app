@@ -1,11 +1,11 @@
 import { getLoggedInUser } from "@/modules/auth/actions/auth";
 import { getBankAccountsByUser } from "@/modules/bankAccounts/actions";
-import { DoughnutChart } from "@/modules/core/components/doughnut-chart";
 import { Heading } from "@/modules/core/components/heading";
 import { RightSidebar } from "@/modules/core/components/right-sidebar";
 import { getBankTransactionsByAccount } from "@/modules/transactions/actions";
-import { TransactionsTab } from "./transactions-tab";
 import { Transaction } from "@/modules/transactions/types";
+import { TransactionsTab } from "./transactions-tab";
+import { DoughnutChart } from "./doughnut-chart";
 
 export const HomePanel = async () => {
   const response = await getLoggedInUser();
@@ -51,13 +51,13 @@ export const HomePanel = async () => {
           />
         </div>
 
-        {/* <div>
+        {<div>
           <DoughnutChart
             data={bankAccounts}
             dataKey={"balance"}
             nameKey={"name"}
           />
-        </div> */}
+        </div> }
 
         <div className="mt-8 max-w-full">
           <TransactionsTab

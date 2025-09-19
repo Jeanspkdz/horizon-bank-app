@@ -109,8 +109,6 @@ export const CategoryCountBar = ({
   const label = categories[type]["label"];
   const Icon = categories[type]["icon"];
 
-  console.log(percentaje);
-
   return (
     <article className={categoryCountBar({ size, type })}>
       <div className={categoryIcon({ size, type })}>

@@ -5,11 +5,12 @@ import {
   getBankAccountById,
 } from "@/modules/bankAccounts/actions";
 import { dwollaClient } from "@/modules/bankConnection/lib/dwolla";
+import { DefaultError } from "@/modules/core/errors";
+import { Response } from "@/modules/core/types";
 
 interface MakeTransferParams {
   senderBankAccountId: string;
   note?: string;
-  receiverEmail: string;
   shareableId: string;
   amount: number;
 }
@@ -17,14 +18,9 @@ interface MakeTransferParams {
 export async function makeTransfer({
   senderBankAccountId,
   shareableId,
-  note,
   amount,
-  receiverEmail,
-}: MakeTransferParams) {
+}: MakeTransferParams) : Promise<Response<string>> {
   try {
-    console.log("NOTE", note);
-    
-
     const senderBankAcccount = await getBankAccountById(senderBankAccountId);
     console.log("SENDER", senderBankAcccount);
 
@@ -49,9 +45,21 @@ export async function makeTransfer({
         value: amount.toString(),
       },
     };
+
     const response = await dwollaClient.post("transfers", requestBody);
-    console.log("TRANSFER_RESPONSE!!!", response.headers.get("location"));
+    const transactionLocation = response.headers.get("location");
+
+    if(transactionLocation == null) throw new DefaultError("Error on transaction")
+
+    return {
+      success: true,
+      data: transactionLocation
+    }
   } catch (error) {
     console.log("[ERR_MAKE_TRANSFER]", error);
+    return {
+      success: false,
+      error: new DefaultError("Error on transaction")
+    }
   }
 }
