@@ -36,8 +36,8 @@ export async function getBankAccount<
   const builtIncludeOptions = buildIncludeOptions(includeOptions);
 
   const { rows } = await tableDB.listRows({
-    databaseId: APPWRITE_DB!!,
-    tableId: APPWRITE_BANK_ACCOUNT_COLLECTION!!,
+    databaseId: APPWRITE_DB,
+    tableId: APPWRITE_BANK_ACCOUNT_COLLECTION,
     queries: [...builtQueryFilters, builtIncludeOptions],
   });
 
@@ -162,8 +162,8 @@ export async function updateBankAccount({
   try {
     const { tableDB } = await createAdminClient();
     await tableDB.updateRow({
-      databaseId: APPWRITE_DB!!,
-      tableId: APPWRITE_BANK_ACCOUNT_COLLECTION!!,
+      databaseId: APPWRITE_DB,
+      tableId: APPWRITE_BANK_ACCOUNT_COLLECTION,
       rowId: id,
       data,
     });
@@ -178,8 +178,8 @@ export async function createBankAccount(bankAccount: BankAccountCreateInput) {
     const { tableDB } = await createAdminClient();
 
     await tableDB.createRow({
-      databaseId: APPWRITE_DB!!,
-      tableId: APPWRITE_BANK_ACCOUNT_COLLECTION!!,
+      databaseId: APPWRITE_DB,
+      tableId: APPWRITE_BANK_ACCOUNT_COLLECTION,
       rowId: ID.unique(),
       data: { ...bankAccount, shareableId: crypto.randomUUID() },
     });
@@ -215,8 +215,8 @@ export async function getBankAccountsFromPlaid(accessToken: string) {
 export async function getBankAccountById(id: string) {
   const { tableDB } = await createAdminClient();
   const row = await tableDB.getRow({
-    databaseId: APPWRITE_DB!!,
-    tableId: APPWRITE_BANK_ACCOUNT_COLLECTION!!,
+    databaseId: APPWRITE_DB,
+    tableId: APPWRITE_BANK_ACCOUNT_COLLECTION,
     rowId: id,
     queries: [Query.select(["*"])],
   });
@@ -230,8 +230,8 @@ export async function getCursorByBankAccount(
   const { database, tableDB } = await createAdminClient();
 
   const response = await tableDB.getRow({
-    databaseId: APPWRITE_DB!!,
-    tableId: APPWRITE_BANK_ACCOUNT_COLLECTION!!,
+    databaseId: APPWRITE_DB,
+    tableId: APPWRITE_BANK_ACCOUNT_COLLECTION,
     rowId: accountId,
   });
 
@@ -245,8 +245,8 @@ export async function updateCursorByBankAccount(
   const { database, tableDB } = await createAdminClient();
 
   const response = await tableDB.updateRow({
-    databaseId: APPWRITE_DB!!,
-    tableId: APPWRITE_BANK_ACCOUNT_COLLECTION!!,
+    databaseId: APPWRITE_DB,
+    tableId: APPWRITE_BANK_ACCOUNT_COLLECTION,
     rowId: accountId,
     data: { transactionCursor: cursor },
   });

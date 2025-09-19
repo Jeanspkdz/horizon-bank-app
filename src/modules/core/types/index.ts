@@ -1,14 +1,12 @@
 import {
-  BankAccount,
-  BankAccountIncludeOptions,
+  BankAccountIncludeOptions
 } from "@/modules/bankAccounts/types";
 import {
-  BankConnection,
-  BankConnectionIncludeOptions,
+  BankConnectionIncludeOptions
 } from "@/modules/bankConnection/types";
-import { BankTransactionIncludeOptions, Transaction } from "@/modules/transactions/types";
+import { BankTransactionIncludeOptions } from "@/modules/transactions/types";
+import { z } from "zod";
 import { CustomError } from "../errors";
-import {z} from "zod"
 
 export type Response<T> =
   | { success: true; data: T }

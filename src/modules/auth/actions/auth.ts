@@ -50,8 +50,8 @@ export async function signUp({
     };
 
     const documentCreated = await database.createDocument(
-      APPWRITE_DB!!!!,
-      APPWRITE_USER_COLLECTION!!!!,
+      APPWRITE_DB,
+      APPWRITE_USER_COLLECTION,
       ID.unique(),
       newUser
     );
@@ -144,8 +144,8 @@ export async function getLoggedInUser() : Promise<Response<User>> {
     const userAccount = await account.get();
 
     const documentResponse = await database.listDocuments(
-      APPWRITE_DB!!,
-      APPWRITE_USER_COLLECTION!!,
+      APPWRITE_DB,
+      APPWRITE_USER_COLLECTION,
       [Query.equal("accountId", userAccount.$id)]
     );
 
@@ -173,7 +173,8 @@ export async function getLoggedInUser() : Promise<Response<User>> {
 
   } catch (error) {
     //Handle Expected Exceptions
-
+    console.log("GET_LOGGED_IN_USER", error);
+    
     return {
       success: false,
       error: new UnexpectedError()

@@ -183,21 +183,21 @@ async function createBankTransactions(transactions: TransactionCreateInput[]) {
   await Promise.all(
     transactions.map(async (transaction) => {
       const response = await tableDB.createRow({
-        databaseId: APPWRITE_DB!!,
-        tableId: APPWRITE_TRANSACTION_COLLECTION!!,
+        databaseId: APPWRITE_DB,
+        tableId: APPWRITE_TRANSACTION_COLLECTION,
         rowId: ID.unique(),
         data: { ...transaction },
       });
     })
   );
 
-  // console.log("Finishing Creating transactions!!!!");
+  // console.log("Finishing Creating transactions");
 }
 
 async function updateBankTransactions(
   transactionUpdateMap: Record<string, TransactionUpdateInput>
 ) {
-  // console.log("Updating transactions!!!!");
+  // console.log("Updating transactions");
 
   const { tableDB } = await createAdminClient();
 
@@ -205,8 +205,8 @@ async function updateBankTransactions(
     Object.entries(transactionUpdateMap).map(
       async ([externalTransactionId, value]) => {
         const { rows } = await tableDB.listRows({
-          databaseId: APPWRITE_DB!!,
-          tableId: APPWRITE_TRANSACTION_COLLECTION!!,
+          databaseId: APPWRITE_DB,
+          tableId: APPWRITE_TRANSACTION_COLLECTION,
           queries: [
             Query.equal("externalTransactionId", externalTransactionId),
           ],
@@ -215,27 +215,27 @@ async function updateBankTransactions(
         const row = rows[0];
 
         const updatedRow = await tableDB.updateRow({
-          databaseId: APPWRITE_DB!!,
-          tableId: APPWRITE_TRANSACTION_COLLECTION!!,
+          databaseId: APPWRITE_DB,
+          tableId: APPWRITE_TRANSACTION_COLLECTION,
           rowId: row.$id,
           data: { ...value },
         });
       }
     )
   );
-  // console.log("Finishing Updating transactions!!!!");
+  // console.log("Finishing Updating transactions");
 }
 
 async function deleteBankTransactions(deletedTransactionIds: TransactionId[]) {
-  // console.log("Deleting transactions!!!!");
+  // console.log("Deleting transactions");
 
   const { tableDB } = await createAdminClient();
 
   await Promise.all(
     deletedTransactionIds.map(async (deleteBankTransactionId) => {
       const { rows } = await tableDB.listRows({
-        databaseId: APPWRITE_DB!!,
-        tableId: APPWRITE_TRANSACTION_COLLECTION!!,
+        databaseId: APPWRITE_DB,
+        tableId: APPWRITE_TRANSACTION_COLLECTION,
         queries: [
           Query.equal("externalTransactionId", deleteBankTransactionId),
         ],
@@ -244,14 +244,14 @@ async function deleteBankTransactions(deletedTransactionIds: TransactionId[]) {
       const row = rows[0];
 
       await tableDB.deleteRow({
-        databaseId: APPWRITE_DB!!,
-        tableId: APPWRITE_TRANSACTION_COLLECTION!!,
+        databaseId: APPWRITE_DB,
+        tableId: APPWRITE_TRANSACTION_COLLECTION,
         rowId: row.$id,
       });
     })
   );
 
-  // console.log("Finishing Deleting transactions!!!!");
+  // console.log("Finishing Deleting transactions!!");
 }
 
 export async function getBankTransactions<

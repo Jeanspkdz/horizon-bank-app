@@ -60,8 +60,8 @@ export async function getBankConnection<
   const builtIncludeOptions = buildIncludeOptions(includeOptions);
 
   const { rows } = await tableDB.listRows({
-    databaseId: APPWRITE_DB!!,
-    tableId: APPWRITE_BANK_CONNECTION_COLLECTION!!,
+    databaseId: APPWRITE_DB,
+    tableId: APPWRITE_BANK_CONNECTION_COLLECTION,
     queries: [...builtQueryFilters, builtIncludeOptions],
   });
 

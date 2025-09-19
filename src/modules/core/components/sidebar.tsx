@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import {
   Sidebar as ShadCnSidebar,
   SidebarContent,
@@ -11,22 +12,20 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "./ui/sidebar";
-import Link from "next/link";
 
+import { signOut } from "@/modules/auth/actions/auth";
+import { getUserInitials } from "@/modules/auth/lib/util";
 import {
-  House,
   CircleDollarSign,
-  ScrollText,
-  CreditCard,
   Handshake,
+  House,
   LogOut,
+  ScrollText
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { Logo } from "./logo";
-import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
-import { getUserInitials } from "@/modules/auth/lib/util";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
-import { signOut } from "@/modules/auth/actions/auth";
 
 const sidebarItems = [
   {
@@ -48,11 +47,6 @@ const sidebarItems = [
     icon: Handshake,
     route: "/payment-transfer",
     label: "Transfer Funds",
-  },
-  {
-    icon: CreditCard,
-    route: "/connect-bank",
-    label: "Connect Bank",
   },
 ];
 
