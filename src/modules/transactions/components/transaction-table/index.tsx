@@ -25,8 +25,9 @@ import { defaultColumns } from "./columns";
 
 interface TransactionsTableProps {
   data: Transaction[];
+  showFull?: boolean
 }
-export const TransactionsTable = ({ data }: TransactionsTableProps) => {
+export const TransactionsTable = ({ data, showFull = true}: TransactionsTableProps) => {
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 12,
@@ -57,6 +58,7 @@ export const TransactionsTable = ({ data }: TransactionsTableProps) => {
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id} className="border-b bg-muted/50">
               {headerGroup.headers.map((header) => {
+                
                 const columnsLength = headerGroup.headers.length || 1;
                 const style = {
                   width: `${100 / columnsLength}%`,
@@ -114,7 +116,7 @@ export const TransactionsTable = ({ data }: TransactionsTableProps) => {
       </Table>
 
       {/* Pagination */}
-      {table.getRowModel().rows.length > 0 && (
+      {(table.getRowModel().rows.length > 0 && showFull) && (
         <div className="mt-6">
           <div className="flex justify-between items-center">
             <Button

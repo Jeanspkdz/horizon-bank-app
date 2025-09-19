@@ -11,9 +11,14 @@ import { PlaidReconnectionError } from "@/modules/core/errors";
 import { isPlaidError } from "@/modules/core/lib/plaid";
 import {
   buildIncludeOptions,
+  buildPagOptions,
   buildQueryFilters,
 } from "@/modules/core/lib/query-builders";
-import { ModelIncludeOptions, ModelQueryFilters } from "@/modules/core/types";
+import {
+  ModelIncludeOptions,
+  ModelPagOptions,
+  ModelQueryFilters,
+} from "@/modules/core/types";
 import {
   BankTransactionIncludeOptions,
   Transaction,
@@ -171,8 +176,7 @@ async function getBankTransactionsByAccountFromPlaid({
 }
 
 async function createBankTransactions(transactions: TransactionCreateInput[]) {
-  console.log("Starting Creating transactions!!!!");
-  console.log(transactions);
+  // console.log("Starting Creating transactions!!!!");
   const { tableDB } = await createAdminClient();
 
   // const response = await database.createDocuments() // Bulk create is not supported for collections with relationship
@@ -187,13 +191,13 @@ async function createBankTransactions(transactions: TransactionCreateInput[]) {
     })
   );
 
-  console.log("Finishing Creating transactions!!!!");
+  // console.log("Finishing Creating transactions!!!!");
 }
 
 async function updateBankTransactions(
   transactionUpdateMap: Record<string, TransactionUpdateInput>
 ) {
-  console.log("Updating transactions!!!!");
+  // console.log("Updating transactions!!!!");
 
   const { tableDB } = await createAdminClient();
 
@@ -219,11 +223,11 @@ async function updateBankTransactions(
       }
     )
   );
-  console.log("Finishing Updating transactions!!!!");
+  // console.log("Finishing Updating transactions!!!!");
 }
 
 async function deleteBankTransactions(deletedTransactionIds: TransactionId[]) {
-  console.log("Deleting transactions!!!!");
+  // console.log("Deleting transactions!!!!");
 
   const { tableDB } = await createAdminClient();
 
@@ -247,45 +251,52 @@ async function deleteBankTransactions(deletedTransactionIds: TransactionId[]) {
     })
   );
 
-  console.log("Finishing Deleting transactions!!!!");
+  // console.log("Finishing Deleting transactions!!!!");
 }
 
 export async function getBankTransactions<
   QFilters extends ModelQueryFilters<Transaction>[],
-  IOptions extends ModelIncludeOptions["Transaction"]
+  IOptions extends ModelIncludeOptions["Transaction"],
+  PagOptions extends ModelPagOptions
 >({
   queryFilters,
   includeOptions,
+  pagOptions,
 }: {
   queryFilters: QFilters;
   includeOptions?: IOptions;
+  pagOptions?: PagOptions;
 }) {
   const { tableDB } = await createAdminClient();
 
   const builtQueryFilters = buildQueryFilters(queryFilters);
   const builtIncludeOptions = buildIncludeOptions(includeOptions);
+  const builtPagOptions = buildPagOptions(pagOptions);
 
   const { rows } = await tableDB.listRows({
     databaseId: APPWRITE_DB!!,
     tableId: APPWRITE_TRANSACTION_COLLECTION!!,
-    queries: [...builtQueryFilters, builtIncludeOptions],
+    queries: [...builtQueryFilters, ...builtPagOptions, builtIncludeOptions],
   });
 
-  const bankConnections = rows.map((row) =>
+  const bankTransactions = rows.map((row) =>
     mapToBankTransaction(row, includeOptions)
   );
 
-  return bankConnections;
+  return bankTransactions;
 }
 
 export async function getBankTransactionsByAccount<
-  IOptions extends BankTransactionIncludeOptions
+  IOptions extends BankTransactionIncludeOptions,
+  PagOptions extends ModelPagOptions
 >({
   bankAccountId,
   includeOptions,
+  pagOptions,
 }: {
   bankAccountId: string;
   includeOptions?: IOptions;
+  pagOptions?: PagOptions;
 }) {
   const bankTransactions = await getBankTransactions({
     queryFilters: [
@@ -296,6 +307,7 @@ export async function getBankTransactionsByAccount<
       },
     ],
     includeOptions,
+    pagOptions,
   });
 
   return bankTransactions;

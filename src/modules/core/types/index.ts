@@ -45,6 +45,13 @@ export type ModelQueryFilters<TModel extends BaseModel> = {
   [K in keyof TModel]: QueryFilter<TModel, K>;
 }[keyof TModel];
 
+export type ModelPagOptions = {
+  limit?: number,
+  offset?: number,
+  cursorAfter?: string,
+  cursorBefore?: string
+}
+
 //INCLUDE OPTIONS
 export type ModelIncludeOptions = {
   "BankAccount" : BankAccountIncludeOptions,

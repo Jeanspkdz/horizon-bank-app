@@ -1,25 +1,45 @@
+import { getUserInitials } from "@/modules/auth/lib/util";
+import { BankAccount } from "@/modules/bankAccounts/types";
 import {
   Avatar,
   AvatarFallback,
   AvatarImage,
 } from "@/modules/core/components/ui/avatar";
 import { Button } from "@/modules/core/components/ui/button";
+import { Transaction } from "@/modules/transactions/types";
 import { Plus } from "lucide-react";
+import { Category, CategoryCountBar } from "./category-count-bar";
 import { CreditCard } from "./credit-card";
-import { getUserInitials } from "@/modules/auth/lib/util";
-import { BankAccount } from "@/modules/bankAccounts/types";
 
 interface RightSidebarProps {
   username: string;
   email: string;
   bankAccounts: BankAccount[];
+  transactions: Transaction[];
 }
 
 export const RightSidebar = ({
   username,
   email,
   bankAccounts,
+  transactions,
 }: RightSidebarProps) => {
+  const transactionsByCategories = Object.groupBy(
+    transactions,
+    (transaction) => transaction.category
+  );
+  const topThreeCategories = Object.fromEntries(
+    Object.entries(transactionsByCategories)
+      .toSorted((a, b) => {
+        return (b[1]?.length || 0) - (a[1]?.length || 0);
+      })
+      .slice(0, 3)
+  ) as Record<Category, Transaction[]>;
+
+  const totalCategories = transactions.length
+
+  console.log("CATEGORIES", topThreeCategories);
+
   return (
     <aside className="lg:flex lg:flex-col lg:w-[355px] lg:h-full border-l border-l-slate-400/30">
       <div className="h-32 bg-[url(/images/gradient-mesh.svg)] bg-cover" />
@@ -64,6 +84,28 @@ export const RightSidebar = ({
                 name={bankAccounts[1].name}
                 className="w-full"
               />
+            </div>
+          </div>
+
+          <div className="mt-15">
+            <h2 className="font-semibold text-xl mb-6">Top Categories</h2>
+
+            <div className="space-y-2.5">
+              {Object.entries(topThreeCategories).map(([key, val] ,index) => {
+                const amount = val.length
+                const percentaje = Math.round((amount / totalCategories) * 100)
+                console.log(percentaje);
+                
+
+                return (
+                  <CategoryCountBar
+                    percentaje={percentaje}
+                    key={index}
+                    amount={amount}
+                    type={key.toLowerCase() as Category} 
+                  />
+                );
+              })}
             </div>
           </div>
         </div>

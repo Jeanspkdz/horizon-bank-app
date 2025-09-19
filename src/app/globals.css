@@ -52,13 +52,6 @@
   --font-ibm-plex-serif: "IBM Plex Serif", serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    /* --background: #0a0a0a;
-    --foreground: #ededed; */
-  }
-}
-
 :root {
   --radius: 0.625rem;
   --card: oklch(1 0 0);

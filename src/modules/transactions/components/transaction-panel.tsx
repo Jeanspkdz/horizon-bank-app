@@ -12,7 +12,7 @@ import {
 } from "../actions";
 import { Transaction } from "../types";
 import { TransactionTableSkeleton } from "./transaction-table/transaction-table-skeleton";
-import { TransactionsTable } from "./transaction-table/transactions-table";
+import { TransactionsTable } from "./transaction-table";
 
 interface TransactionPanelProps {
   bankAccountsPromise: Promise<
