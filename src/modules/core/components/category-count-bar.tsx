@@ -1,9 +1,11 @@
 import { cva, VariantProps } from "class-variance-authority";
 import {
   BadgeDollarSign,
+  Car,
   LucideIcon,
   Package,
   Plane,
+  TrendingUp,
   Utensils,
 } from "lucide-react";
 
@@ -11,7 +13,7 @@ type CategoriesData = {
   label: string;
   icon: LucideIcon;
 };
-export type Category = "loan_payments" | "travel" | "food_and_drink" | "other";
+export type Category = "loan_payments" | "travel" | "food_and_drink" | "other" | "income" | "transportation";
 
 
 const categories: Record<Category, CategoriesData> = {
@@ -31,6 +33,14 @@ const categories: Record<Category, CategoriesData> = {
     label: "Others",
     icon: Package,
   },
+  income: {
+    label: "Income",
+    icon: TrendingUp,
+  },
+  transportation: {
+    label: "Transportation",
+    icon: Car,
+  },
 };
 
 const categoryCountBar = cva("flex gap-4 items-center px-5 py-4 rounded-2xl font-semibold", {
@@ -40,6 +50,8 @@ const categoryCountBar = cva("flex gap-4 items-center px-5 py-4 rounded-2xl font
       travel: ["bg-pink-300/15", "text-pink-600"],
       food_and_drink: ["bg-green-300/15", "text-green-600"],
       other: ["bg-accent-foreground"],
+     income: ["bg-yellow-300/15", "text-yellow-600"],
+      transportation: ["bg-orange-300/15", "text-orange-600"],
     },
     size: {
       small: ["text-xs"],
@@ -59,6 +71,8 @@ const categoryIcon = cva("rounded-full p-3 ", {
       travel: ["bg-pink-400/25"],
       food_and_drink: ["bg-green-400/25"],
       other: ["bg-accent-foreground/25"],
+      income: ["bg-yellow-400/25"],
+      transportation: ["bg-orange-400/25"],
     },
     size: {
       small: ["text-xs"],
@@ -78,6 +92,8 @@ const categoryBar = cva("rounded-3xl overflow-hidden mt-2 h-2 [&>div]:h-full", {
       travel: ["bg-pink-400/25 [&>div]:bg-pink-600"],
       food_and_drink: ["bg-green-400/25 [&>div]:bg-green-600"],
       other: ["bg-accent-foreground/25, [&>div]:bg-accent-foreground"],
+    income: ["bg-yellow-400/25 [&>div]:bg-yellow-600"],
+      transportation: ["bg-orange-400/25 [&>div]:bg-orange-600"],
     },
     size: {
       small: ["text-xs"],
@@ -106,8 +122,8 @@ export const CategoryCountBar = ({
   size = "medium",
   type = "other",
 }: CategoryProgressProps) => {
-  const label = categories[type]["label"];
-  const Icon = categories[type]["icon"];
+  const label = categories[type]?.["label"] ?? 'Others';
+  const Icon = categories[type]?.["icon"] ?? Package;
 
   return (
     <article className={categoryCountBar({ size, type })}>
@@ -121,7 +137,6 @@ export const CategoryCountBar = ({
           <span>{amount}</span>
         </div>
 
-        {/* Percentaje */}
         <div className={categoryBar({ size, type })}>
           <div style={{ width: `${percentaje}%` }}></div>
         </div>

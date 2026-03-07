@@ -93,6 +93,9 @@ export const RightSidebar = ({
                 const amount = val.length
                 const percentaje = Math.round((amount / totalCategories) * 100)
 
+                console.log('CATEGORY', key.toLowerCase());
+                
+
                 return (
                   <CategoryCountBar
                     percentaje={percentaje}
