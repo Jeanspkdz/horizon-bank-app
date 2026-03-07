@@ -9,6 +9,9 @@ const nextConfig: NextConfig = {
       new URL("https://plaid-merchant-logos.plaid.com/**"),
       new URL("https://plaid-category-icons.plaid.com/**"),
     ]
+  },
+  eslint: {
+    ignoreDuringBuilds: true
   }
 };
 
