@@ -7,6 +7,8 @@ import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { Toaster } from "sonner";
 
+export const dynamic = "force-dynamic";
+
 const DashboardLayout = async ({
   children,
 }: Readonly<{ children: React.ReactNode }>) => {
