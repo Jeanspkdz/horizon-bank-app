@@ -10,7 +10,7 @@ import { createDwollaCustomer } from "@/modules/bankConnection/actions/dwolla";
 import { VerifiedPersonalCustomer } from "@/modules/bankConnection/types";
 import { createAdminClient , createSessionClient} from "@/modules/core/actions/appwrite";
 import { APPWRITE_COOKIE_NAME } from "@/modules/core/consts";
-import { CustomError, DefaultError, UnexpectedError } from "@/modules/core/errors";
+import { CustomError, DefaultError, UnexpectedError, toResponseError } from "@/modules/core/errors";
 import { Response } from "@/modules/core/types";
 import { cookies } from "next/headers";
 import { AppwriteException, ID, Query } from "node-appwrite";
@@ -68,7 +68,7 @@ export async function signUp({
       path: "/",
       httpOnly: true,
       sameSite: "strict",
-      secure: true,
+      secure: process.env.NODE_ENV === "production",
     });
 
     return {
@@ -88,7 +88,7 @@ export async function signUp({
 
     return {
       success: false,
-      error: customErr,
+      error: toResponseError(customErr),
     };
   }
 }
@@ -105,7 +105,7 @@ export async function signIn(values: SignInSchema): Promise<Response<null>> {
       path: "/",
       httpOnly: true,
       sameSite: "strict",
-      secure: true,
+      secure: process.env.NODE_ENV === "production",
     });
 
     return {
@@ -113,19 +113,24 @@ export async function signIn(values: SignInSchema): Promise<Response<null>> {
       data: null,
     }; 
   } catch (error) {
-    console.log("[ERR_SIGN_IN_ACTION]", error);
-
-    let customErr: CustomError = new DefaultError("Something went wrong");
+    const customErr: CustomError = new DefaultError("Something went wrong");
 
     if (error instanceof AppwriteException) {
       if (error.type == "user_invalid_credentials") {
-        customErr = new UserInvalidCredentialsError("Invalid credentials");
+        return {
+          success: false,
+          error: toResponseError(
+            new UserInvalidCredentialsError("Invalid credentials")
+          ),
+        };
       }
     }
 
+    console.log("[ERR_SIGN_IN_ACTION]", error);
+
     return {
       success: false,
-      error: customErr,
+      error: toResponseError(customErr),
     };
   }
 }
@@ -177,7 +182,7 @@ export async function getLoggedInUser() : Promise<Response<User>> {
     
     return {
       success: false,
-      error: new UnexpectedError()
+      error: toResponseError(new UnexpectedError())
     }
   }
 }

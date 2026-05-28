@@ -3,7 +3,7 @@
 import { updateBankAccountsBalanceByUser } from "@/modules/bankAccounts/actions";
 import { updateBankTransactionsByUser } from "@/modules/transactions/actions";
 import { Response } from "../types";
-import { PlaidReconnectionError } from "../errors";
+import { PlaidReconnectionError, toResponseError } from "../errors";
 
 export async function syncUserBankData(
   userId: string
@@ -24,7 +24,7 @@ export async function syncUserBankData(
     if(error instanceof PlaidReconnectionError){
       return {
         success: false,
-        error: error,
+        error: toResponseError(error),
       }
     }
 

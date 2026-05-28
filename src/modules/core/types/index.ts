@@ -6,17 +6,11 @@ import {
 } from "@/modules/bankConnection/types";
 import { BankTransactionIncludeOptions } from "@/modules/transactions/types";
 import { z } from "zod";
-import { CustomError } from "../errors";
+import { ResponseError } from "../errors";
 
 export type Response<T> =
   | { success: true; data: T }
-  | { success: false; error: CustomError };
-
-type KnownPropertiesOnly<TargetType, ReferenceType> = {
-  [K in keyof TargetType]: K extends keyof ReferenceType
-    ? TargetType[K]
-    : never;
-};
+  | { success: false; error: ResponseError };
 
 export type Expand<T> = T extends infer O ? { [K in keyof O]: O[K] } : never;
 

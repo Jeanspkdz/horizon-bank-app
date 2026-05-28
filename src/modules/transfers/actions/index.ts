@@ -5,7 +5,7 @@ import {
   getBankAccountById,
 } from "@/modules/bankAccounts/actions";
 import { dwollaClient } from "@/modules/bankConnection/lib/dwolla";
-import { DefaultError } from "@/modules/core/errors";
+import { DefaultError, toResponseError } from "@/modules/core/errors";
 import { Response } from "@/modules/core/types";
 
 interface MakeTransferParams {
@@ -59,7 +59,7 @@ export async function makeTransfer({
     console.log("[ERR_MAKE_TRANSFER]", error);
     return {
       success: false,
-      error: new DefaultError("Error on transaction")
+      error: toResponseError(new DefaultError("Error on transaction"))
     }
   }
 }

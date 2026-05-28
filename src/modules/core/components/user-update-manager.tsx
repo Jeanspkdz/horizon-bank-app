@@ -1,6 +1,4 @@
 import { getLoggedInUser } from "@/modules/auth/actions/auth";
-import { PlaidReconnectionError } from "../errors";
-
 import { createLinkTokenForUpdateMode } from "@/modules/bankConnection/actions/plaid";
 import { syncUserBankData } from "../actions";
 import { ReauthenticateModal } from "./reauthenticate-modal";
@@ -8,7 +6,7 @@ import { ReauthenticateModal } from "./reauthenticate-modal";
 export const UserUpdateManager = async () => {
   const authResponse = await getLoggedInUser();
   if (!authResponse.success) {
-    throw authResponse.error;
+    return null;
   }
   const user = authResponse.data;
 
@@ -20,14 +18,14 @@ export const UserUpdateManager = async () => {
 
   const error = response.error
 
-  if(typeof error !== 'object' || !(error instanceof PlaidReconnectionError)){
-    throw error
+  if(error.name !== "PlaidReconnectionError" || !error.accessToken){
+    throw new Error(error.message)
   }
 
   const linkTokenResponse = await createLinkTokenForUpdateMode(user, error.accessToken) 
 
   if(!linkTokenResponse.success){
-    throw linkTokenResponse.error
+    throw new Error(linkTokenResponse.error.message)
   }
 
   return (

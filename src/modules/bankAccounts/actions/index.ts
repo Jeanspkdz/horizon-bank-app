@@ -10,7 +10,7 @@ import { getBankConnectionsByUserId } from "@/modules/bankConnection/actions/ban
 import { plaidClient } from "@/modules/bankConnection/lib/plaid";
 import { BankConnection } from "@/modules/bankConnection/types";
 import { createAdminClient } from "@/modules/core/actions/appwrite";
-import { DefaultError, PlaidReconnectionError } from "@/modules/core/errors";
+import { DefaultError, PlaidReconnectionError, toResponseError } from "@/modules/core/errors";
 import {
   buildIncludeOptions,
   buildQueryFilters,
@@ -135,11 +135,11 @@ export async function updateBankAccountsBalanceByUser(
          if (isPlaidError(error) && error.response?.data.error_code === 'ITEM_LOGIN_REQUIRED') {
           return {
             success: false,
-            error: new PlaidReconnectionError(
+            error: toResponseError(new PlaidReconnectionError(
               'ITEM_LOGIN_REQUIRED',
               bankConnection.accessToken,
               bankConnection.id
-            )
+            ))
           };
         }
       }
@@ -227,7 +227,7 @@ export async function getBankAccountById(id: string) {
 export async function getCursorByBankAccount(
   accountId: string
 ): Promise<string | null> {
-  const { database, tableDB } = await createAdminClient();
+  const { tableDB } = await createAdminClient();
 
   const response = await tableDB.getRow({
     databaseId: APPWRITE_DB,
@@ -242,7 +242,7 @@ export async function updateCursorByBankAccount(
   accountId: string,
   cursor: string
 ): Promise<string | null> {
-  const { database, tableDB } = await createAdminClient();
+  const { tableDB } = await createAdminClient();
 
   const response = await tableDB.updateRow({
     databaseId: APPWRITE_DB,

@@ -15,11 +15,12 @@ import {
 import { Input } from "@/modules/core/components/ui/input";
 import { Button } from "@/modules/core/components/ui/button";
 import { signIn } from "@/modules/auth/actions/auth";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Loader } from "lucide-react";
 
 function SignInPage() {
+  const router = useRouter();
   const form = useForm<SignInSchema>({
     resolver: zodResolver(SignInSchema),
     defaultValues: {
@@ -33,11 +34,16 @@ function SignInPage() {
 
     if (response.success) {
       toast.success("Sign In Successful");
-      return redirect("/");
+      router.push("/");
+      return;
     }
 
-    console.log(response.error);
     toast.error(response.error.message);
+  };
+
+  const autocompleteDemoCredentials = () => {
+    form.setValue("email", "correo4@correo.com", { shouldValidate: true });
+    form.setValue("password", "1q2w3e4r", { shouldValidate: true });
   };
 
   return (
@@ -101,6 +107,16 @@ function SignInPage() {
               ) : (
                 "Sign In"
               )}
+            </Button>
+
+            <Button
+              disabled={form.formState.isSubmitting}
+              type="button"
+              variant="outline"
+              onClick={autocompleteDemoCredentials}
+              className="cursor-pointer"
+            >
+              Use demo credentials
             </Button>
           </form>
         </Form>

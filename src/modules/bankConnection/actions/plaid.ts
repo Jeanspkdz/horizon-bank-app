@@ -12,7 +12,7 @@ import {
   BankConnectionCreateInput,
   LinkToken
 } from "@/modules/bankConnection/types";
-import { DefaultError } from "@/modules/core/errors";
+import { DefaultError, toResponseError } from "@/modules/core/errors";
 import { Response } from "@/modules/core/types";
 import {
   CountryCode,
@@ -50,7 +50,7 @@ export async function createLinkTokenForUpdateMode(
 
     return {
       success: false,
-      error: new DefaultError("Something went wrong"),
+      error: toResponseError(new DefaultError("Something went wrong")),
     };
   }
 }
@@ -81,7 +81,7 @@ export async function createLinkToken(
 
     return {
       success: false,
-      error: new DefaultError("Something went wrong"),
+      error: toResponseError(new DefaultError("Something went wrong")),
     };
   }
 }
@@ -198,7 +198,7 @@ export async function setUpBankAccountIntegration({
 
     return {
       success: false,
-      error: new DefaultError("Something went wrong"),
+      error: toResponseError(new DefaultError("Something went wrong")),
     };
   }
 }

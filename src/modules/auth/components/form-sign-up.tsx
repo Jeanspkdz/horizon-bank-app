@@ -16,7 +16,6 @@ import { Input } from "@/modules/core/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Loader } from "lucide-react";
-import { redirect } from "next/navigation";
 import { User } from "../types";
 
 interface FormSignUpProps {
@@ -48,7 +47,6 @@ export const FormSignUp = ({ updateUser }: FormSignUpProps) => {
       updateUser(response.data);
       return;
     }
-    console.log(response.error);
     toast.error(response.error.message);
   };
 
