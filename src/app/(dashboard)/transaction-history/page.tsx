@@ -3,12 +3,13 @@ import { getLoggedInUser } from "@/modules/auth/actions/auth";
 import { getBankAccountsByUser } from "@/modules/bankAccounts/actions";
 import { TransactionPanel } from "@/modules/transactions/components/transaction-panel";
 import { TransactionPanelSkeleton } from "@/modules/transactions/components/transaction-panel-skeleton";
+import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
 async function TransactionHistoryPage() {
   const user = await getLoggedInUser();
   if (!user.success) {
-    throw user.error;
+    redirect("/sign-in");
   }
 
   const bankAccountsPromise =  getBankAccountsByUser({

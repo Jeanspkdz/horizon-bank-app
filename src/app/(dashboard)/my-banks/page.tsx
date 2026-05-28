@@ -2,13 +2,14 @@ import { getLoggedInUser } from "@/modules/auth/actions/auth";
 import { UserBankAccountsList } from "@/modules/bankAccounts/components/bank-account-list";
 import { UserBankAccountListSkeleton } from "@/modules/bankAccounts/components/bank-account-list-skeleton";
 import { Heading } from "@/modules/core/components/heading";
+import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
 async function MyBanksPage() {
   const userResponse = await getLoggedInUser();
 
   if (!userResponse.success) {
-    throw userResponse.error;
+    redirect("/sign-in");
   }
 
   const user = userResponse.data;

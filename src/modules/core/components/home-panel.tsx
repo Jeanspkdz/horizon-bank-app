@@ -6,12 +6,13 @@ import { getBankTransactionsByAccount } from "@/modules/transactions/actions";
 import { Transaction } from "@/modules/transactions/types";
 import { TransactionsTab } from "./transactions-tab";
 import { DoughnutChart } from "./doughnut-chart";
+import { redirect } from "next/navigation";
 
 export const HomePanel = async () => {
   const response = await getLoggedInUser();
 
   if (!response.success) {
-    throw response.error;
+    redirect("/sign-in");
   }
   const user = response.data;
 
@@ -34,7 +35,7 @@ export const HomePanel = async () => {
   );
   const transactionsFlatted = transactions.flat(1);
   
-  let transactionsGrouped = Object.groupBy(
+  const transactionsGrouped = Object.groupBy(
     transactionsFlatted,
     (tr) => tr.bankAccount.name
   ) as Record<string, Transaction[]>;
