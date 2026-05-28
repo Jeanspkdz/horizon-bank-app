@@ -43,7 +43,7 @@ export type BankAccountWithInclude<T extends BankAccountIncludeOptions | undefin
     BankAccount &
       (T extends { bankConnection: true }
         ? { bankConnection: BankConnection; bankConnectionId: string }
-        : {})
+        : object)
   >;
 
 export type BankAccount = z.infer<typeof BankAccount>;

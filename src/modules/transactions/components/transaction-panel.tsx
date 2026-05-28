@@ -35,7 +35,7 @@ export const TransactionPanel = ({
   const [isLoading, setIsLoading] = useState(false);
 
   const totalBalance = transactions.reduce((acc, current) => {
-      return acc += current.amount
+      return acc + current.amount
   }, 0)
 
   // In development/sandbox, balance may not be accurate due to Plaid sandbox limitations.
@@ -53,7 +53,7 @@ export const TransactionPanel = ({
         if (isCancelled) return;
         const transactions = await getBankTransactionsByAccount(
          {
-          bankAccountId:  selectedBankAccount.id
+          bankAccountId: selectedBankAccount.id
          }
         );
 
@@ -69,9 +69,9 @@ export const TransactionPanel = ({
     fetchTransactions();
 
     return () => {
-      isCancelled = false;
+      isCancelled = true;
     };
-  }, [bankAccountId]);
+  }, [bankAccountId, selectedBankAccount]);
 
   return (
     <div className="p-5">

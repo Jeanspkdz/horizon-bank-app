@@ -31,7 +31,7 @@ export const UserBankAccountsList = async ({
       ) : (
         <div className="">
           <p className="max-w-[60ch] mt-4 italic text-gray-600">
-            It seems you don't have any bank accounts connected. If this is an
+            It seems you don&apos;t have any bank accounts connected. If this is an
             problem, please contact support
           </p>
         </div>

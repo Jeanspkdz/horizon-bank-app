@@ -15,13 +15,11 @@ export type BankConnectionIncludeOptions = {
   user: boolean;
 };
 
-type T = BankConnectionWithInclude<{ user: true }>;
-
 export type BankConnectionWithInclude<
   T extends BankConnectionIncludeOptions | undefined
 > = Expand<
   BankConnection &
-    (T extends { user: true } ? { userId: string; user: User } : {})
+    (T extends { user: true } ? { userId: string; user: User } : object)
 >;
 
 export type BankConnection = z.infer<typeof BankConnection>;

@@ -24,8 +24,8 @@ export async function createBankConnection(
     const { tableDB } = await createAdminClient();
 
     const rowCreated = await tableDB.createRow({
-      databaseId: APPWRITE_DB!!,
-      tableId: APPWRITE_BANK_CONNECTION_COLLECTION!!,
+      databaseId: APPWRITE_DB!,
+      tableId: APPWRITE_BANK_CONNECTION_COLLECTION!,
       data: bankConnection,
       rowId: ID.unique(),
     });

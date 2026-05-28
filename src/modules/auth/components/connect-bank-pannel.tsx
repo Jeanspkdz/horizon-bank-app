@@ -1,5 +1,4 @@
 import {
-  PlaidLinkOnSuccess,
   PlaidLinkOptions,
   usePlaidLink,
 } from "react-plaid-link";
@@ -18,7 +17,7 @@ interface ConnectBankPanel {
 
 export const ConnectBankPanel = ({ user, linkToken }: ConnectBankPanel) => {
   const config: PlaidLinkOptions = {
-    onSuccess: async (public_token, metadata) => {
+    onSuccess: async (public_token) => {
       // SetUp BankAccount
       const response = await setUpBankAccountIntegration({
         publicToken: public_token,

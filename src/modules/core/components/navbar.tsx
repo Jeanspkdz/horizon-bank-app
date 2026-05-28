@@ -5,7 +5,7 @@ import { useSidebar } from "./ui/sidebar";
 import { Menu } from "lucide-react";
 
 export const Navbar = () => {
-  const { toggleSidebar, ...props } = useSidebar();
+  const { toggleSidebar } = useSidebar();
 
   return (
     <header className="block md:hidden bg-white z-10 sticky self-start top-0 left-0 w-full py-4 px-5 shadow-md">

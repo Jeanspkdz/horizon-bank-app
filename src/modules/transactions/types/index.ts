@@ -26,7 +26,7 @@ export type BankTransactionWithInclude<
   Transaction &
     (T extends { bankAccount: true }
       ? { bankAccount: BankAccount; bankAccountId: string }
-      : {})
+      : object)
 >;
 
 export type Transaction = z.infer<typeof Transaction>;

@@ -182,7 +182,7 @@ async function createBankTransactions(transactions: TransactionCreateInput[]) {
   // const response = await database.createDocuments() // Bulk create is not supported for collections with relationship
   await Promise.all(
     transactions.map(async (transaction) => {
-      const response = await tableDB.createRow({
+      await tableDB.createRow({
         databaseId: APPWRITE_DB,
         tableId: APPWRITE_TRANSACTION_COLLECTION,
         rowId: ID.unique(),
@@ -201,7 +201,7 @@ async function updateBankTransactions(
 
   const { tableDB } = await createAdminClient();
 
-  const responses = await Promise.all(
+  await Promise.all(
     Object.entries(transactionUpdateMap).map(
       async ([externalTransactionId, value]) => {
         const { rows } = await tableDB.listRows({
@@ -214,7 +214,7 @@ async function updateBankTransactions(
 
         const row = rows[0];
 
-        const updatedRow = await tableDB.updateRow({
+        await tableDB.updateRow({
           databaseId: APPWRITE_DB,
           tableId: APPWRITE_TRANSACTION_COLLECTION,
           rowId: row.$id,
@@ -274,8 +274,8 @@ export async function getBankTransactions<
   const builtPagOptions = buildPagOptions(pagOptions);
 
   const { rows } = await tableDB.listRows({
-    databaseId: APPWRITE_DB!!,
-    tableId: APPWRITE_TRANSACTION_COLLECTION!!,
+    databaseId: APPWRITE_DB!,
+    tableId: APPWRITE_TRANSACTION_COLLECTION!,
     queries: [...builtQueryFilters, ...builtPagOptions, builtIncludeOptions],
   });
 

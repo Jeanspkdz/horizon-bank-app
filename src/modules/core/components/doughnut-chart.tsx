@@ -53,9 +53,9 @@ interface DoughnutChartProps<T extends Record<string, unknown>> {
   const totalBalance = React.useMemo(() => {
     return data.reduce((acc, curr) => {
       const value = curr[dataKey] as number
-      return acc += value
+      return acc + value
     }, 0);
-  }, []);
+  }, [data, dataKey]);
 
   return (
     <Card className="">

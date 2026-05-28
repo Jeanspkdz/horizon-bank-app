@@ -54,7 +54,7 @@ export function buildIncludeOptions(
 export function buildIncludeOptions<
   TModel extends ModelIncludeOptions[keyof ModelIncludeOptions]
 >(includeOptions?: TModel): string {
-  let query = ["*"];
+  const query = ["*"];
 
   if (!includeOptions) {
     return Query.select(query);

@@ -137,7 +137,7 @@ export const TransferPanel = ({ bankAccountsPromise }: TransferPanelProps) => {
           <div className="space-y-8">
             <div className="flex items-center gap-12">
               <div className="flex-4/12 ">
-                <h4 className="font-medium">Recipient's Email Address</h4>
+                <h4 className="font-medium">Recipient&apos;s Email Address</h4>
               </div>
 
               <div className="flex-8/12">
@@ -161,7 +161,7 @@ export const TransferPanel = ({ bankAccountsPromise }: TransferPanelProps) => {
 
             <div className="flex items-center gap-12">
               <div className="flex-4/12 ">
-                <h4 className="font-medium">Recipient's Plaid Sharable ID</h4>
+                <h4 className="font-medium">Recipient&apos;s Plaid Sharable ID</h4>
               </div>
 
               <div className="flex-8/12">

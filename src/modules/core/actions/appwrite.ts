@@ -6,8 +6,8 @@ import { Account, Client, Databases, TablesDB } from "node-appwrite";
 
 export async function createSessionClient() {
   const client = new Client()
-    .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!!!!)
-    .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT!!!!);
+    .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!)
+    .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT!);
 
   const cookiesStore = await cookies();
   const session = cookiesStore.get(APPWRITE_COOKIE_NAME);
@@ -27,9 +27,9 @@ export async function createSessionClient() {
 
 export async function createAdminClient() {
   const client = new Client()
-    .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!!!!)
-    .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT!!!!)
-    .setKey(process.env.NEXT_APPWRITE_KEY!!!!);
+    .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!)
+    .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT!)
+    .setKey(process.env.NEXT_APPWRITE_KEY!);
 
   return {
     get account() {
